@@ -156,7 +156,7 @@ export default function CreateProjectPage() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-[#3182F6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Building2 size={32} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">
@@ -172,7 +172,7 @@ export default function CreateProjectPage() {
                 setFormState(prev => ({ ...prev, projectName: e.target.value, error: '' }))
               }
               onKeyPress={handleKeyPress}
-              className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent transition-all ${
+              className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
                 formState.error ? 'border-red-500' : 'border-gray-300'
               }`}
               autoFocus
@@ -194,7 +194,7 @@ export default function CreateProjectPage() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-[#3182F6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin size={32} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">위치를 알려주세요</h2>
@@ -208,7 +208,7 @@ export default function CreateProjectPage() {
                 setFormState(prev => ({ ...prev, location: e.target.value, error: '' }))
               }
               onKeyPress={handleKeyPress}
-              className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent transition-all ${
+              className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
                 formState.error ? 'border-red-500' : 'border-gray-300'
               }`}
               autoFocus
@@ -230,7 +230,7 @@ export default function CreateProjectPage() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-[#3182F6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Maximize2 size={32} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">
@@ -247,7 +247,7 @@ export default function CreateProjectPage() {
                   setFormState(prev => ({ ...prev, area: e.target.value, error: '' }))
                 }
                 onKeyPress={handleKeyPress}
-                className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent transition-all ${
+                className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
                   formState.error ? 'border-red-500' : 'border-gray-300'
                 }`}
                 autoFocus
@@ -273,7 +273,7 @@ export default function CreateProjectPage() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-[#3182F6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home size={32} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">
@@ -295,7 +295,7 @@ export default function CreateProjectPage() {
                       setFormState(prev => ({ ...prev, rooms: e.target.value, error: '' }))
                     }
                     onKeyPress={handleKeyPress}
-                    className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
                       formState.error ? 'border-red-500' : 'border-gray-300'
                     }`}
                     autoFocus
@@ -322,7 +322,7 @@ export default function CreateProjectPage() {
                       }))
                     }
                     onKeyPress={handleKeyPress}
-                    className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
                       formState.error ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
@@ -366,7 +366,7 @@ export default function CreateProjectPage() {
             {/* Progress bar */}
             <div className="h-1 bg-gray-100">
               <div
-                className="h-full bg-[#3182F6] transition-all duration-300"
+                className="h-full bg-[#4b5840] transition-all duration-300"
                 style={{ width: `${(formState.step / 4) * 100}%` }}
               />
             </div>
@@ -386,7 +386,7 @@ export default function CreateProjectPage() {
             className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all duration-200 ${
               formState.isLoading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-[#3182F6] text-white hover:bg-[#1E40AF] shadow-lg hover:shadow-xl'
+                : 'bg-[#4b5840] text-white hover:bg-[#3c3733] shadow-lg hover:shadow-xl'
             }`}
           >
             {formState.isLoading ? (

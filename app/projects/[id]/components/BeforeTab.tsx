@@ -31,23 +31,23 @@ export default function BeforeTab({
   return (
     <>
       {/* 서비스 이용 가이드 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl overflow-hidden">
+      <div className="bg-[#f5f3ef] border border-blue-200 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowGuide(!showGuide)}
           className="w-full px-4 py-3 flex items-start justify-between hover:bg-blue-100 transition-colors"
         >
           <div className="flex items-start gap-2.5">
-            <div className="w-5 h-5 rounded-full bg-[#3182F6] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-5 h-5 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="text-left">
               <h3 className="font-semibold text-sm text-gray-900 mb-0.5">서비스 이용 가이드</h3>
-              <p className="text-xs text-[#3182F6]">이용 방법을 확인해보세요</p>
+              <p className="text-xs text-[#4b5840]">이용 방법을 확인해보세요</p>
             </div>
           </div>
-          <ChevronDown size={18} className={`text-[#3182F6] transition-transform flex-shrink-0 mt-0.5 ${showGuide ? 'rotate-180' : ''}`} />
+          <ChevronDown size={18} className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showGuide ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -62,8 +62,8 @@ export default function BeforeTab({
               <div className="px-4 pb-4 pt-1 space-y-4 bg-white">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-[#3182F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-9 h-9 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-[#4b5840]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -205,10 +205,10 @@ export default function BeforeTab({
                               />
                               <button
                                 onClick={() => fileInputRefs.current[`before-${space.id}-${shot.id}`]?.click()}
-                                className="aspect-[4/3] border-2 border-dashed border-[#3182F6] rounded-lg flex flex-col items-center justify-center gap-1.5 hover:bg-blue-50 transition-colors"
+                                className="aspect-[4/3] border-2 border-dashed border-[#4b5840] rounded-lg flex flex-col items-center justify-center gap-1.5 hover:bg-[#f5f3ef] transition-colors"
                               >
-                                <Upload size={20} className="text-[#3182F6]" />
-                                <span className="text-xs font-medium text-[#3182F6]">
+                                <Upload size={20} className="text-[#4b5840]" />
+                                <span className="text-xs font-medium text-[#4b5840]">
                                   시공 전 사진 추가
                                 </span>
                               </button>

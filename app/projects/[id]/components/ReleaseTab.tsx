@@ -29,17 +29,17 @@ export default function ReleaseTab({
           className="w-full px-4 py-3 flex items-start justify-between hover:bg-blue-100 transition-colors"
         >
           <div className="flex items-start gap-2.5">
-            <div className="w-5 h-5 rounded-full bg-[#3182F6] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-5 h-5 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="text-left">
               <h3 className="font-semibold text-sm text-gray-900 mb-0.5">서비스 이용 가이드</h3>
-              <p className="text-xs text-[#3182F6]">이용 방법을 확인해보세요</p>
+              <p className="text-xs text-[#4b5840]">이용 방법을 확인해보세요</p>
             </div>
           </div>
-          <ChevronDown size={18} className={`text-[#3182F6] transition-transform flex-shrink-0 mt-0.5 ${showReleaseGuide ? 'rotate-180' : ''}`} />
+          <ChevronDown size={18} className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showReleaseGuide ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -55,7 +55,7 @@ export default function ReleaseTab({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-[#3182F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#4b5840]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                     </div>
@@ -105,7 +105,7 @@ export default function ReleaseTab({
                 <h3 className="font-semibold text-sm text-gray-900">📝 블로그 콘텐츠</h3>
                 <button
                   onClick={() => handleCopy(project.editingContent!.blog)}
-                  className="px-3 py-1.5 bg-[#3182F6] text-white rounded-lg hover:bg-blue-600 transition-colors text-xs font-medium"
+                  className="px-3 py-1.5 bg-[#4b5840] text-white rounded-lg hover:bg-[#3c3733] transition-colors text-xs font-medium"
                 >
                   복사하기
                 </button>
@@ -123,7 +123,7 @@ export default function ReleaseTab({
                 <h3 className="font-semibold text-sm text-gray-900">📷 인스타그램 포스트</h3>
                 <button
                   onClick={() => handleCopy(project.editingContent!.instagram)}
-                  className="px-3 py-1.5 bg-[#3182F6] text-white rounded-lg hover:bg-blue-600 transition-colors text-xs font-medium"
+                  className="px-3 py-1.5 bg-[#4b5840] text-white rounded-lg hover:bg-[#3c3733] transition-colors text-xs font-medium"
                 >
                   복사하기
                 </button>
@@ -141,7 +141,7 @@ export default function ReleaseTab({
                 <h3 className="font-semibold text-sm text-gray-900">#️⃣ 해시태그</h3>
                 <button
                   onClick={() => handleCopy(project.editingContent!.hashtags)}
-                  className="px-3 py-1.5 bg-[#3182F6] text-white rounded-lg hover:bg-blue-600 transition-colors text-xs font-medium"
+                  className="px-3 py-1.5 bg-[#4b5840] text-white rounded-lg hover:bg-[#3c3733] transition-colors text-xs font-medium"
                 >
                   복사하기
                 </button>
@@ -163,7 +163,7 @@ export default function ReleaseTab({
           <p className="text-xs text-gray-500 mb-4">Step 4에서 콘텐츠를 생성하고 저장해보세요</p>
           <button
             onClick={() => setActiveTab(4)}
-            className="px-6 py-2 bg-[#3182F6] text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+            className="px-6 py-2 bg-[#4b5840] text-white rounded-lg hover:bg-[#3c3733] transition-colors text-sm font-medium"
           >
             Step 4로 이동
           </button>

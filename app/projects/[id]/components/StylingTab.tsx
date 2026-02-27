@@ -54,23 +54,23 @@ export default function StylingTab({
   return (
     <>
       {/* 서비스 이용 가이드 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl overflow-hidden">
+      <div className="bg-[#f5f3ef] border border-blue-200 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowStylingGuide(!showStylingGuide)}
           className="w-full px-4 py-3 flex items-start justify-between hover:bg-blue-100 transition-colors"
         >
           <div className="flex items-start gap-2.5">
-            <div className="w-5 h-5 rounded-full bg-[#3182F6] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-5 h-5 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="text-left">
               <h3 className="font-semibold text-sm text-gray-900 mb-0.5">서비스 이용 가이드</h3>
-              <p className="text-xs text-[#3182F6]">이용 방법을 확인해보세요</p>
+              <p className="text-xs text-[#4b5840]">이용 방법을 확인해보세요</p>
             </div>
           </div>
-          <ChevronDown size={18} className={`text-[#3182F6] transition-transform flex-shrink-0 mt-0.5 ${showStylingGuide ? 'rotate-180' : ''}`} />
+          <ChevronDown size={18} className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showStylingGuide ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -85,8 +85,8 @@ export default function StylingTab({
               <div className="px-4 pb-4 pt-1 space-y-4 bg-white">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-[#3182F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-9 h-9 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-[#4b5840]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                       </svg>
                     </div>
@@ -393,7 +393,7 @@ export default function StylingTab({
                   onClick={() => hasAfterPhotos && setSelectedSpace(space.id)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl border transition-colors ${
                     hasAfterPhotos
-                      ? 'bg-white border-gray-200 hover:border-[#3182F6] hover:bg-blue-50'
+                      ? 'bg-white border-gray-200 hover:border-[#4b5840] hover:bg-[#f5f3ef]'
                       : 'bg-gray-50 border-gray-200 cursor-not-allowed'
                   }`}
                   disabled={!hasAfterPhotos}
@@ -442,11 +442,11 @@ export default function StylingTab({
           </button>
 
           {/* 선택된 공간 정보 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="bg-[#f5f3ef] border border-blue-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
                 {DEFAULT_SPACES.find(s => s.id === selectedSpace)?.icon &&
-                  React.createElement(DEFAULT_SPACES.find(s => s.id === selectedSpace)!.icon, { size: 20, className: 'text-[#3182F6]' })
+                  React.createElement(DEFAULT_SPACES.find(s => s.id === selectedSpace)!.icon, { size: 20, className: 'text-[#4b5840]' })
                 }
               </div>
               <div>
@@ -471,7 +471,7 @@ export default function StylingTab({
                       onClick={() => setSelectedPhoto(photo as string)}
                       className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                         selectedPhoto === photo
-                          ? 'border-[#3182F6] ring-2 ring-blue-200'
+                          ? 'border-[#4b5840] ring-2 ring-[#5e6e4d]/30'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -504,7 +504,7 @@ export default function StylingTab({
                     onClick={() => setSelectedStyle(style.id)}
                     className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
                       selectedStyle === style.id
-                        ? 'border-[#3182F6] bg-blue-50 text-[#3182F6]'
+                        ? 'border-[#4b5840] bg-[#f5f3ef] text-[#4b5840]'
                         : 'border-gray-200 text-gray-700 hover:border-gray-300'
                     }`}
                   >
@@ -521,7 +521,7 @@ export default function StylingTab({
               <button
                 onClick={handleAIStyling}
                 disabled={isStyling}
-                className="w-full py-3 bg-[#3182F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-[#4b5840] text-white rounded-lg hover:bg-[#3c3733] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isStyling ? (
                   <div className="flex items-center justify-center gap-2">
@@ -541,7 +541,7 @@ export default function StylingTab({
                   className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 space-y-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#3182F6] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0">
                       <svg className="w-6 h-6 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
@@ -555,7 +555,7 @@ export default function StylingTab({
                   {/* 진행 단계 */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs">
-                      <div className="w-2 h-2 rounded-full bg-[#3182F6] animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-[#4b5840] animate-pulse" />
                       <span className="text-gray-700">이미지 분석 중...</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs">

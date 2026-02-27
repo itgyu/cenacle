@@ -37,17 +37,17 @@ export default function AfterTab({
           className="w-full px-4 py-3 flex items-start justify-between hover:bg-blue-100 transition-colors"
         >
           <div className="flex items-start gap-2.5">
-            <div className="w-5 h-5 rounded-full bg-[#3182F6] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-5 h-5 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="text-left">
               <h3 className="font-semibold text-sm text-gray-900 mb-0.5">서비스 이용 가이드</h3>
-              <p className="text-xs text-[#3182F6]">이용 방법을 확인해보세요</p>
+              <p className="text-xs text-[#4b5840]">이용 방법을 확인해보세요</p>
             </div>
           </div>
-          <ChevronDown size={18} className={`text-[#3182F6] transition-transform flex-shrink-0 mt-0.5 ${showAfterGuide ? 'rotate-180' : ''}`} />
+          <ChevronDown size={18} className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showAfterGuide ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -63,7 +63,7 @@ export default function AfterTab({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-[#3182F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#4b5840]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                       </svg>
                     </div>

@@ -429,7 +429,7 @@ export default function ProjectDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -497,7 +497,7 @@ export default function ProjectDetailPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
                   activeTab === tab.id
-                    ? 'text-[#3182F6]'
+                    ? 'text-[#4b5840]'
                     : 'text-gray-600'
                 }`}
               >
@@ -505,7 +505,7 @@ export default function ProjectDetailPage() {
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3182F6]"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4b5840]"
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
@@ -551,7 +551,7 @@ export default function ProjectDetailPage() {
 
             {/* 프로젝트 아이콘과 기본 정보 */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-[#3182F6] rounded-2xl flex items-center justify-center flex-shrink-0">
+              <div className="w-16 h-16 bg-[#4b5840] rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Building2 size={32} className="text-white" />
               </div>
               <div>
@@ -598,7 +598,7 @@ export default function ProjectDetailPage() {
             {/* 확인 버튼 */}
             <button
               onClick={() => setShowProjectInfo(false)}
-              className="w-full py-3 px-4 bg-[#3182F6] text-white rounded-xl font-semibold hover:bg-[#2968D7] transition-colors"
+              className="w-full py-3 px-4 bg-[#4b5840] text-white rounded-xl font-semibold hover:bg-[#3c3733] transition-colors"
             >
               확인
             </button>

@@ -87,7 +87,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -108,8 +108,8 @@ export default function DashboardPage() {
               className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Image
-                src="/images/m_logo.png"
-                alt="Keystone Partners Logo"
+                src="/images/cenacle_logo.png"
+                alt="세나클디자인 로고"
                 width={28}
                 height={28}
                 className="object-contain"
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                 placeholder="진행중인 프로젝트명을 입력"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 pl-9 pr-3 text-xs bg-gray-100 border-0 rounded-full placeholder-gray-400 placeholder:text-xs focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full h-8 pl-9 pr-3 text-xs bg-gray-100 border-0 rounded-full placeholder-gray-400 placeholder:text-xs focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#4b5840] transition-colors"
               />
             </div>
 
@@ -145,7 +145,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#3182F6] to-[#1E40AF] text-white px-5 py-8"
+          className="bg-gradient-to-br from-[#4b5840] to-[#3c3733] text-white px-5 py-8"
         >
           <div className="mb-6">
             <p className="text-blue-100 text-sm mb-1">{companyName}</p>
@@ -194,7 +194,7 @@ export default function DashboardPage() {
               className="text-center py-16"
             >
               <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FolderOpen size={32} className="text-[#3182F6]" />
+                <FolderOpen size={32} className="text-[#4b5840]" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 첫 프로젝트를 시작해보세요
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center">
                       <div className={`w-2 h-2 rounded-full mr-2 ${
-                        project.status === 'active' ? 'bg-[#3182F6]' :
+                        project.status === 'active' ? 'bg-[#4b5840]' :
                         project.status === 'completed' ? 'bg-green-500' : 'bg-gray-400'
                       }`} />
                       <span className="text-xs text-gray-500">
@@ -249,7 +249,7 @@ export default function DashboardPage() {
 
                   {/* 하단 */}
                   <div className="flex items-center justify-end">
-                    <div className="flex items-center text-[#3182F6] text-sm font-medium">
+                    <div className="flex items-center text-[#4b5840] text-sm font-medium">
                       <span>자세히 보기</span>
                       <ArrowRight size={16} className="ml-1" />
                     </div>
@@ -266,7 +266,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           onClick={() => router.push('/create-project')}
-          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 bg-gradient-to-r from-[#3182F6] to-[#1E40AF] text-white font-semibold py-3 px-6 rounded-full shadow-xl border border-blue-400/20 flex items-center justify-center gap-2 text-sm whitespace-nowrap hover:shadow-2xl transition-all"
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 bg-gradient-to-r from-[#4b5840] to-[#3c3733] text-white font-semibold py-3 px-6 rounded-full shadow-xl border border-[#5e6e4d]/20 flex items-center justify-center gap-2 text-sm whitespace-nowrap hover:shadow-2xl transition-all"
         >
           새 프로젝트 시작
         </motion.button>

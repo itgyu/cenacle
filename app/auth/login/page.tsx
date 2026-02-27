@@ -82,7 +82,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="w-full max-w-[430px] min-h-screen bg-[#3182F6] flex flex-col shadow-2xl relative touch-manipulation">
+      <div className="w-full max-w-[430px] min-h-screen bg-[#4b5840] flex flex-col shadow-2xl relative touch-manipulation">
         {/* 뒤로 가기 버튼 (Step 2에서만 표시) */}
         {step === 2 && (
           <button
@@ -124,7 +124,7 @@ export default function LoginPage() {
                       이메일을 입력해주세요
                     </h2>
                     <p className="text-white/80">
-                      Keystone Partners 계정으로 로그인하세요
+                      세나클디자인 계정으로 로그인하세요
                     </p>
                   </div>
 
@@ -228,11 +228,11 @@ export default function LoginPage() {
             <button
               onClick={step === 1 ? handleEmailSubmit : handlePasswordSubmit}
               disabled={isLoading || (step === 1 ? !email.trim() : !password.trim())}
-              className="w-full h-14 text-lg bg-white text-[#3182F6] hover:bg-gray-50 border-0 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+              className="w-full h-14 text-lg bg-white text-[#4b5840] hover:bg-gray-50 border-0 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-[#3182F6] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
                   로그인 중...
                 </div>
               ) : (

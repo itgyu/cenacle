@@ -109,7 +109,7 @@ export default function MyPage() {
             type="text"
             value={editProfile[field]}
             onChange={(e) => setEditProfile({ ...editProfile, [field]: e.target.value })}
-            className="w-full text-base font-medium text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-base font-medium text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4b5840]"
             placeholder={`${label} 입력`}
           />
         ) : (
@@ -164,7 +164,7 @@ export default function MyPage() {
 
           {/* 로딩 스피너 */}
           <div className="flex-1 flex items-center justify-center" style={{ paddingTop: '60px' }}>
-            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function MyPage() {
                   onClick={handleSaveEdit}
                   className="p-2 rounded-lg hover:bg-blue-50 transition-colors"
                 >
-                  <Save size={20} className="text-blue-600" />
+                  <Save size={20} className="text-[#4b5840]" />
                 </button>
               </div>
             ) : (

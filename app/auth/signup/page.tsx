@@ -96,16 +96,16 @@ export default function SignupPage() {
         {/* 로고 */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">K</span>
+            <div className="w-12 h-12 bg-[#4b5840] rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-2xl">C</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">Keystone Partners</span>
+            <span className="text-2xl font-bold text-gray-900">세나클디자인</span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             계정 만들기
           </h1>
           <p className="text-gray-600">
-            Keystone Partners에 오신 것을 환영합니다
+            세나클디자인에 오신 것을 환영합니다
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export default function SignupPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="홍길동"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="example@email.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -153,7 +153,7 @@ export default function SignupPage() {
                 value={formData.company}
                 onChange={handleChange}
                 placeholder="(주)회사명"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -168,7 +168,7 @@ export default function SignupPage() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="010-1234-5678"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -183,7 +183,7 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="8자 이상"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -198,7 +198,7 @@ export default function SignupPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="비밀번호 재입력"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all"
               />
             </div>
 
@@ -209,14 +209,14 @@ export default function SignupPage() {
                   name="agreed"
                   checked={formData.agreed}
                   onChange={handleChange}
-                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="mt-1 w-4 h-4 text-[#4b5840] border-gray-300 rounded focus:ring-[#4b5840]"
                 />
                 <span className="text-sm text-gray-600">
-                  <Link href="/terms" className="text-blue-600 hover:text-blue-700 font-medium">
+                  <Link href="/terms" className="text-[#4b5840] hover:text-[#3c3733] font-medium">
                     이용약관
                   </Link>
                   {' '}및{' '}
-                  <Link href="/privacy" className="text-blue-600 hover:text-blue-700 font-medium">
+                  <Link href="/privacy" className="text-[#4b5840] hover:text-[#3c3733] font-medium">
                     개인정보처리방침
                   </Link>
                   에 동의합니다 <span className="text-red-500">*</span>
@@ -233,7 +233,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#4b5840] text-white py-3 rounded-xl font-semibold hover:bg-[#3c3733] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? '처리 중...' : '회원가입'}
             </button>
@@ -242,7 +242,7 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               이미 계정이 있으신가요?{' '}
-              <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 font-semibold">
+              <Link href="/auth/login" className="text-[#4b5840] hover:text-[#3c3733] font-semibold">
                 로그인
               </Link>
             </p>
