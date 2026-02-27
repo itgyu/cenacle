@@ -36,27 +36,32 @@ export default function MyPage() {
   const loadProfile = useCallback(async () => {
     try {
       setIsLoading(true);
-      const email = localStorage.getItem('user-email');
-      if (!email) {
+
+      // 토큰 확인 (인증 상태 체크)
+      const token = localStorage.getItem('token');
+      if (!token) {
         router.push('/auth/login');
         return;
       }
 
-      const keystoneUser = localStorage.getItem('keystoneUser');
-      if (keystoneUser) {
+      // 사용자 정보 로드 (auth-api에서 저장하는 'user' 키 사용)
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
         try {
-          const userData = JSON.parse(keystoneUser);
-          const phone =
-            userData.phone || userData.contact || userData.mobile || userData.phoneNumber;
+          const userData = JSON.parse(userStr);
           setUserProfile({
             name: userData.name || '',
-            email: email,
+            email: userData.email || '',
             company: userData.company || '',
-            phone: phone || '',
+            phone: userData.phone || '',
           });
         } catch (e) {
           console.error('사용자 데이터 파싱 오류:', e);
+          router.push('/auth/login');
         }
+      } else {
+        // user 데이터가 없으면 로그인 페이지로
+        router.push('/auth/login');
       }
     } catch (e) {
       console.error('프로필 로드 오류:', e);
@@ -358,9 +363,8 @@ export default function MyPage() {
                     </button>
                     <button
                       onClick={() => {
-                        localStorage.removeItem('keystoneUser');
-                        localStorage.removeItem('user-email');
-                        localStorage.removeItem('auth-token');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
                         router.push('/auth/login');
                       }}
                       className="flex-1 px-4 py-3 bg-red-600 rounded-xl font-medium text-white hover:bg-red-700 transition-colors"
