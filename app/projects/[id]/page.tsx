@@ -26,7 +26,7 @@ export default function ProjectDetailPage() {
     living: false,
     kitchen: false,
     bedroom: false,
-    bathroom: false
+    bathroom: false,
   });
   const [showStylingGuide, setShowStylingGuide] = useState(false);
   const [showEditingGuide, setShowEditingGuide] = useState(false);
@@ -66,7 +66,11 @@ export default function ProjectDetailPage() {
         console.error('[ProjectDetail] Failed to load project:', result.error);
 
         // If authentication error, redirect to login
-        if (result.error.includes('로그인') || result.error.includes('token') || result.error.includes('인증')) {
+        if (
+          result.error.includes('로그인') ||
+          result.error.includes('token') ||
+          result.error.includes('인증')
+        ) {
           console.log('[ProjectDetail] Authentication error, redirecting to login...');
           router.replace('/auth/login');
           return;
@@ -79,7 +83,23 @@ export default function ProjectDetailPage() {
 
       if (result.data) {
         console.log('[ProjectDetail] Project loaded:', result.data);
-        setProject(result.data as any);
+        // Ensure required fields have default values
+        const projectData = {
+          ...result.data,
+          beforePhotos: result.data.beforePhotos || {},
+          afterPhotos: result.data.afterPhotos || {},
+          stylingPhotos: result.data.stylingPhotos || {},
+          aiStylePhotos: result.data.aiStylePhotos || [],
+          spaces: result.data.spaces || [],
+          content: result.data.content || {
+            title: '',
+            description: '',
+            hashtags: [],
+            channels: [],
+          },
+          currentStep: result.data.currentStep || 1,
+        };
+        setProject(projectData as any);
       } else {
         router.push('/dashboard');
       }
@@ -91,9 +111,9 @@ export default function ProjectDetailPage() {
   }, [params, router]);
 
   const toggleSpace = (spaceId: string) => {
-    setExpandedSpaces(prev => ({
+    setExpandedSpaces((prev) => ({
       ...prev,
-      [spaceId]: !prev[spaceId]
+      [spaceId]: !prev[spaceId],
     }));
   };
 
@@ -102,7 +122,12 @@ export default function ProjectDetailPage() {
     if (!project) return;
 
     try {
-      console.log('[PhotoUpload] Uploading before photo:', { spaceId, shotId, fileName: file.name, fileSize: file.size });
+      console.log('[PhotoUpload] Uploading before photo:', {
+        spaceId,
+        shotId,
+        fileName: file.name,
+        fileSize: file.size,
+      });
 
       // Presigned URL 방식으로 S3에 직접 업로드
       const result = await uploadPhoto(project.projectId, file, 'before', spaceId, shotId);
@@ -120,10 +145,10 @@ export default function ProjectDetailPage() {
           ...project.beforePhotos,
           [spaceId]: {
             ...(project.beforePhotos[spaceId] || {}),
-            [shotId]: result.data // S3 URL
-          }
+            [shotId]: result.data, // S3 URL
+          },
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       console.log('[PhotoUpload] Updated project:', updatedProject);
@@ -140,7 +165,12 @@ export default function ProjectDetailPage() {
     if (!project) return;
 
     try {
-      console.log('[PhotoUpload] Uploading after photo:', { spaceId, shotId, fileName: file.name, fileSize: file.size });
+      console.log('[PhotoUpload] Uploading after photo:', {
+        spaceId,
+        shotId,
+        fileName: file.name,
+        fileSize: file.size,
+      });
 
       // Presigned URL 방식으로 S3에 직접 업로드
       const result = await uploadPhoto(project.projectId, file, 'after', spaceId, shotId);
@@ -158,10 +188,10 @@ export default function ProjectDetailPage() {
           ...project.afterPhotos,
           [spaceId]: {
             ...(project.afterPhotos[spaceId] || {}),
-            [shotId]: result.data // S3 URL
-          }
+            [shotId]: result.data, // S3 URL
+          },
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       console.log('[PhotoUpload] Updated project:', updatedProject);
@@ -185,10 +215,10 @@ export default function ProjectDetailPage() {
         ...project[type === 'before' ? 'beforePhotos' : 'afterPhotos'],
         [spaceId]: {
           ...(project[type === 'before' ? 'beforePhotos' : 'afterPhotos'][spaceId] || {}),
-          [shotId]: undefined
-        }
+          [shotId]: undefined,
+        },
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     setProject(updatedProject);
@@ -207,7 +237,7 @@ export default function ProjectDetailPage() {
       const response = await fetch('/api/edit', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           projectName: project.projectName,
@@ -216,8 +246,8 @@ export default function ProjectDetailPage() {
           rooms: project.rooms,
           bathrooms: project.bathrooms,
           concept: editingConcept,
-          color: editingColor
-        })
+          color: editingColor,
+        }),
       });
 
       const data = await response.json();
@@ -229,9 +259,9 @@ export default function ProjectDetailPage() {
           editingContent: {
             blog: data.blog,
             instagram: data.instagram,
-            hashtags: data.hashtags
+            hashtags: data.hashtags,
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         };
 
         console.log('[AIEdit] Updated project:', updatedProject);
@@ -261,7 +291,9 @@ export default function ProjectDetailPage() {
     if (!project) return;
 
     // TODO: API로 프로젝트 삭제 기능 구현 필요
-    alert('프로젝트 삭제 기능은 아직 구현되지 않았습니다.\n서버 API를 통한 삭제 기능을 추가해야 합니다.');
+    alert(
+      '프로젝트 삭제 기능은 아직 구현되지 않았습니다.\n서버 API를 통한 삭제 기능을 추가해야 합니다.'
+    );
   };
 
   // AI 스타일링 처리
@@ -287,7 +319,9 @@ export default function ProjectDetailPage() {
 
       // API 키가 설정되지 않은 경우
       if (data.needsApiKey) {
-        alert('AI API 키가 설정되지 않았습니다.\n\n.env.local 파일에 HUGGINGFACE_API_TOKEN을 추가해주세요.\n\nAPI 토큰은 https://huggingface.co/settings/tokens 에서 무료로 발급받을 수 있습니다.\n\n완전 무료이며, 회원가입 후 바로 사용 가능합니다!');
+        alert(
+          'AI API 키가 설정되지 않았습니다.\n\n.env.local 파일에 HUGGINGFACE_API_TOKEN을 추가해주세요.\n\nAPI 토큰은 https://huggingface.co/settings/tokens 에서 무료로 발급받을 수 있습니다.\n\n완전 무료이며, 회원가입 후 바로 사용 가능합니다!'
+        );
         return;
       }
 
@@ -308,10 +342,10 @@ export default function ProjectDetailPage() {
             originalPhoto: selectedPhoto,
             styledPhoto: styledImage,
             style: selectedStyle,
-            createdAt: new Date().toISOString()
-          }
+            createdAt: new Date().toISOString(),
+          },
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       console.log('[AIStyling] Updated project:', updatedProject);
@@ -320,13 +354,14 @@ export default function ProjectDetailPage() {
 
       // TODO: API로 S3에 업로드하고 DynamoDB 업데이트하는 기능 추가 필요
 
-      alert('AI 스타일링이 완료되어 사진 보관함에 저장되었습니다!\n(참고: 새로고침하면 사라집니다)');
+      alert(
+        'AI 스타일링이 완료되어 사진 보관함에 저장되었습니다!\n(참고: 새로고침하면 사라집니다)'
+      );
 
       // 상태 초기화
       setSelectedSpace(null);
       setSelectedPhoto(null);
       setSelectedStyle('modern');
-
     } catch (error: any) {
       console.error('스타일링 오류:', error);
       alert(error.message || '스타일링 처리 중 오류가 발생했습니다.');
@@ -334,7 +369,6 @@ export default function ProjectDetailPage() {
       setIsStyling(false);
     }
   };
-
 
   // 탭별 콘텐츠 렌더링 함수
   const renderTabContent = () => {
@@ -425,7 +459,6 @@ export default function ProjectDetailPage() {
     }
   };
 
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -453,9 +486,7 @@ export default function ProjectDetailPage() {
               >
                 <ArrowLeft size={24} className="text-gray-900" />
               </button>
-              <h1 className="text-lg font-semibold text-gray-900">
-                {project.projectName}
-              </h1>
+              <h1 className="text-lg font-semibold text-gray-900">{project.projectName}</h1>
             </div>
 
             {/* 오른쪽: 아이콘들 */}
@@ -496,9 +527,7 @@ export default function ProjectDetailPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
-                  activeTab === tab.id
-                    ? 'text-[#4b5840]'
-                    : 'text-gray-600'
+                  activeTab === tab.id ? 'text-[#4b5840]' : 'text-gray-600'
                 }`}
               >
                 {tab.name}
@@ -516,9 +545,7 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* 콘텐츠 */}
-        <div className="px-4 py-3 space-y-3">
-          {renderTabContent()}
-        </div>
+        <div className="px-4 py-3 space-y-3">{renderTabContent()}</div>
       </div>
 
       {/* 사진 보관함 모달 */}
@@ -557,11 +584,14 @@ export default function ProjectDetailPage() {
               <div>
                 <h3 className="text-lg font-bold text-gray-900">{project.projectName}</h3>
                 <p className="text-sm text-gray-500">
-                  생성일: {new Date(project.createdAt).toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  }).replace(/\. /g, '. ')}
+                  생성일:{' '}
+                  {new Date(project.createdAt)
+                    .toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })
+                    .replace(/\. /g, '. ')}
                 </p>
               </div>
             </div>
