@@ -1,78 +1,45 @@
-const AWS = require('aws-sdk');
-const jwt = require('jsonwebtoken');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { handlePreflight, authenticateRequest, response } = require('./shared');
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = 'KeystonePartners'; // DynamoDB 테이블 이름
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-
-// CORS 헤더
-const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-  'Content-Type': 'application/json'
-};
-
-// JWT 토큰 검증
-function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
-}
+// DynamoDB 클라이언트 설정
+const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'eu-north-1' });
+const docClient = DynamoDBDocumentClient.from(client);
+const TABLE_NAME = process.env.TABLE_NAME || 'KeystonePartners';
 
 exports.handler = async (event) => {
-  console.log('Event:', JSON.stringify(event, null, 2));
+  const origin = event.headers?.origin || event.headers?.Origin || '';
 
   // OPTIONS 요청 처리 (CORS preflight)
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  const preflightResponse = handlePreflight(event);
+  if (preflightResponse) {
+    return preflightResponse;
   }
 
   try {
-    // Authorization 헤더에서 토큰 추출
-    const authHeader = event.headers.Authorization || event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'No token provided' })
-      };
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'Invalid token' })
-      };
+    // 인증 확인
+    const { user, error: authError } = authenticateRequest(event);
+    if (authError) {
+      return response.unauthorized(authError, origin);
     }
 
     // userId를 String으로 변환 (DynamoDB 타입 일치)
-    const userId = String(decoded.userId);
+    const userId = String(user.userId);
 
     // DynamoDB에서 사용자의 모든 프로젝트 조회
-    const result = await dynamodb.query({
+    const queryCommand = new QueryCommand({
       TableName: TABLE_NAME,
       KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
       ExpressionAttributeValues: {
         ':pk': `USER#${userId}`,
-        ':sk': 'PROJECT#'
-      }
-    }).promise();
+        ':sk': 'PROJECT#',
+      },
+    });
 
-    console.log('Query result:', result);
+    const result = await docClient.send(queryCommand);
 
     // 프로젝트 데이터 변환 (PK, SK 제거)
-    const projects = result.Items.map(item => ({
+    const projects = result.Items.map((item) => ({
       projectId: item.projectId,
       projectName: item.projectName,
       location: item.location,
@@ -81,30 +48,22 @@ exports.handler = async (event) => {
       bathrooms: item.bathrooms,
       status: item.status,
       createdAt: item.createdAt,
-      updatedAt: item.updatedAt
+      updatedAt: item.updatedAt,
     }));
 
     // 최신순 정렬
     projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        projects: projects,
-        total: projects.length
-      })
-    };
-
+    return response.success(
+      {
+        projects,
+        total: projects.length,
+      },
+      origin
+    );
   } catch (error) {
-    console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Internal server error',
-        message: error.message
-      })
-    };
+    console.error('GetProjects Error:', error.message);
+
+    return response.serverError('Internal server error', origin);
   }
 };

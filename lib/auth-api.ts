@@ -1,4 +1,5 @@
 import { apiRequest, authenticatedApiRequest, API_ENDPOINTS } from './api-config';
+import { logger, getUserFriendlyMessage } from './errors';
 
 // 타입 정의
 export interface SignupData {
@@ -43,7 +44,31 @@ export interface ProfileResponse {
   };
 }
 
-// 회원가입 API
+/**
+ * Save auth data to localStorage
+ */
+function saveAuthData(token: string, user: User): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    logger.debug('Auth data saved');
+  }
+}
+
+/**
+ * Clear auth data from localStorage
+ */
+function clearAuthData(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    logger.debug('Auth data cleared');
+  }
+}
+
+/**
+ * 회원가입 API
+ */
 export async function signup(signupData: SignupData) {
   const { data, error } = await apiRequest<AuthResponse>(API_ENDPOINTS.SIGNUP, {
     method: 'POST',
@@ -51,21 +76,22 @@ export async function signup(signupData: SignupData) {
   });
 
   if (error || !data) {
-    return { error: error || '회원가입에 실패했습니다.' };
+    return { error: getUserFriendlyMessage(error || '회원가입에 실패했습니다.') };
   }
 
-  // 토큰과 사용자 정보 저장 (실제 API 응답 형식에 맞춤)
+  // 토큰과 사용자 정보 저장
   if (data.token) {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    saveAuthData(data.token, data.user);
   }
 
   return { data: { user: data.user, token: data.token } };
 }
 
-// 로그인 API
+/**
+ * 로그인 API
+ */
 export async function login(loginData: LoginData) {
-  console.log('[Login] Starting login with:', loginData.email);
+  logger.debug('Starting login for:', loginData.email);
 
   const { data, error } = await apiRequest<AuthResponse>(API_ENDPOINTS.LOGIN, {
     method: 'POST',
@@ -73,60 +99,56 @@ export async function login(loginData: LoginData) {
   });
 
   if (error || !data) {
-    console.error('[Login] Login failed:', error);
-
-    // API 에러 메시지를 사용자 친화적인 한글로 변환
-    let errorMessage = error || '로그인에 실패했습니다.';
-
-    if (error?.includes('Invalid credentials') || error?.includes('password')) {
-      errorMessage = '이메일 또는 비밀번호가 일치하지 않습니다.';
-    } else if (error?.includes('User not found') || error?.includes('not found')) {
-      errorMessage = '등록되지 않은 이메일입니다.';
-    } else if (error?.includes('network') || error?.includes('Network')) {
-      errorMessage = '네트워크 오류가 발생했습니다. 다시 시도해주세요.';
-    }
-
-    return { error: errorMessage };
+    logger.debug('Login failed');
+    return { error: getUserFriendlyMessage(error || '로그인에 실패했습니다.') };
   }
 
-  // 토큰과 사용자 정보 저장 (실제 API 응답 형식에 맞춤)
+  // 토큰과 사용자 정보 저장
   if (data.token) {
-    console.log('[Login] Saving token and user to localStorage');
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    console.log('[Login] Token saved:', data.token.substring(0, 20) + '...');
-    console.log('[Login] User saved:', data.user);
+    saveAuthData(data.token, data.user);
+    logger.debug('Login successful');
   }
 
   return { data: { user: data.user, token: data.token } };
 }
 
-// 프로필 조회 API
+/**
+ * 프로필 조회 API
+ */
 export async function getProfile() {
-  const { data, error } = await authenticatedApiRequest<ProfileResponse>(
-    API_ENDPOINTS.PROFILE
-  );
+  const { data, error } = await authenticatedApiRequest<ProfileResponse>(API_ENDPOINTS.PROFILE);
 
   if (error || !data) {
-    return { error: error || '프로필 조회에 실패했습니다.' };
+    return { error: getUserFriendlyMessage(error || '프로필 조회에 실패했습니다.') };
   }
 
   // 사용자 정보 업데이트
-  localStorage.setItem('user', JSON.stringify(data.data.user));
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('user', JSON.stringify(data.data.user));
+  }
 
   return { data: data.data.user };
 }
 
-// 로그아웃
+/**
+ * 로그아웃
+ */
 export function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  clearAuthData();
 }
 
-// 현재 로그인된 사용자 정보 가져오기
+/**
+ * 현재 로그인된 사용자 정보 가져오기
+ */
 export function getCurrentUser(): User | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   const userStr = localStorage.getItem('user');
-  if (!userStr) return null;
+  if (!userStr) {
+    return null;
+  }
 
   try {
     return JSON.parse(userStr);
@@ -135,7 +157,12 @@ export function getCurrentUser(): User | null {
   }
 }
 
-// 로그인 상태 확인
+/**
+ * 로그인 상태 확인
+ */
 export function isAuthenticated(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
   return !!localStorage.getItem('token');
 }

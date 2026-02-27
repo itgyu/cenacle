@@ -1,9 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, User, Mail, Building, Phone, MessageCircle, LogOut, ChevronRight, Edit3, Save, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Building,
+  Phone,
+  MessageCircle,
+  LogOut,
+  ChevronRight,
+  Edit3,
+  Save,
+  X,
+  LucideIcon,
+} from 'lucide-react';
 
 interface UserProfile {
   name: string;
@@ -20,11 +33,7 @@ export default function MyPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setIsLoading(true);
       const email = localStorage.getItem('user-email');
@@ -37,12 +46,13 @@ export default function MyPage() {
       if (keystoneUser) {
         try {
           const userData = JSON.parse(keystoneUser);
-          const phone = userData.phone || userData.contact || userData.mobile || userData.phoneNumber;
+          const phone =
+            userData.phone || userData.contact || userData.mobile || userData.phoneNumber;
           setUserProfile({
             name: userData.name || '',
             email: email,
             company: userData.company || '',
-            phone: phone || ''
+            phone: phone || '',
           });
         } catch (e) {
           console.error('사용자 데이터 파싱 오류:', e);
@@ -53,7 +63,11 @@ export default function MyPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const handleEdit = () => {
     setEditProfile(userProfile);
@@ -73,7 +87,7 @@ export default function MyPage() {
       name: editProfile.name,
       email: editProfile.email,
       company: editProfile.company,
-      phone: editProfile.phone
+      phone: editProfile.phone,
     };
     localStorage.setItem('keystoneUser', JSON.stringify(keystoneUser));
 
@@ -89,9 +103,9 @@ export default function MyPage() {
     value,
     field,
     isLast = false,
-    editable = true
+    editable = true,
   }: {
-    icon: any;
+    icon: LucideIcon;
     label: string;
     value: string;
     field: keyof UserProfile;
@@ -119,8 +133,14 @@ export default function MyPage() {
     </div>
   );
 
-  const ActionButton = ({ icon: Icon, title, description, onClick, color = 'gray' }: {
-    icon: any;
+  const ActionButton = ({
+    icon: Icon,
+    title,
+    description,
+    onClick,
+    color = 'gray',
+  }: {
+    icon: LucideIcon;
     title: string;
     description: string;
     onClick: () => void;
@@ -131,7 +151,9 @@ export default function MyPage() {
       onClick={onClick}
       className="w-full bg-white rounded-2xl p-5 border border-gray-200 hover:border-gray-300 transition-colors flex items-center"
     >
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${color === 'red' ? 'bg-red-50' : 'bg-gray-50'}`}>
+      <div
+        className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${color === 'red' ? 'bg-red-50' : 'bg-gray-50'}`}
+      >
         <Icon size={24} className={color === 'red' ? 'text-red-600' : 'text-gray-600'} />
       </div>
       <div className="flex-1 text-left">
@@ -218,7 +240,7 @@ export default function MyPage() {
           style={{
             paddingTop: '60px',
             WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'none'
+            overscrollBehavior: 'none',
           }}
         >
           <div className="p-4 space-y-4">
@@ -233,10 +255,35 @@ export default function MyPage() {
               </div>
               {userProfile && (
                 <div>
-                  <EditableInfoRow icon={User} label="이름" value={userProfile.name} field="name" editable={true} />
-                  <EditableInfoRow icon={Mail} label="이메일" value={userProfile.email} field="email" editable={false} />
-                  <EditableInfoRow icon={Building} label="회사명" value={userProfile.company || '미입력'} field="company" editable={true} />
-                  <EditableInfoRow icon={Phone} label="연락처" value={userProfile.phone || '미입력'} field="phone" editable={true} isLast={true} />
+                  <EditableInfoRow
+                    icon={User}
+                    label="이름"
+                    value={userProfile.name}
+                    field="name"
+                    editable={true}
+                  />
+                  <EditableInfoRow
+                    icon={Mail}
+                    label="이메일"
+                    value={userProfile.email}
+                    field="email"
+                    editable={false}
+                  />
+                  <EditableInfoRow
+                    icon={Building}
+                    label="회사명"
+                    value={userProfile.company || '미입력'}
+                    field="company"
+                    editable={true}
+                  />
+                  <EditableInfoRow
+                    icon={Phone}
+                    label="연락처"
+                    value={userProfile.phone || '미입력'}
+                    field="phone"
+                    editable={true}
+                    isLast={true}
+                  />
                 </div>
               )}
             </motion.div>
@@ -254,8 +301,13 @@ export default function MyPage() {
                   title="고객센터 문의"
                   description="궁금한 것이 있으시면 언제든 문의해주세요"
                   onClick={() => {
-                    const body = encodeURIComponent('안녕하세요! Keystone Partners 관련 문의사항이 있습니다.');
-                    window.open(`mailto:support@keystonepartners.com?subject=고객센터 문의&body=${body}`, '_blank');
+                    const body = encodeURIComponent(
+                      '안녕하세요! Keystone Partners 관련 문의사항이 있습니다.'
+                    );
+                    window.open(
+                      `mailto:support@keystonepartners.com?subject=고객센터 문의&body=${body}`,
+                      '_blank'
+                    );
                   }}
                 />
                 <ActionButton

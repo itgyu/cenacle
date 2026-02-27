@@ -1,26 +1,11 @@
-const AWS = require('aws-sdk');
-const jwt = require('jsonwebtoken');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { handlePreflight, authenticateRequest, response, validation } = require('./shared');
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = 'KeystonePartners'; // DynamoDB 테이블 이름
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-
-// CORS 헤더
-const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-  'Content-Type': 'application/json'
-};
-
-// JWT 토큰 검증
-function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
-}
+// DynamoDB 클라이언트 설정
+const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'eu-north-1' });
+const docClient = DynamoDBDocumentClient.from(client);
+const TABLE_NAME = process.env.TABLE_NAME || 'KeystonePartners';
 
 // 프로젝트 ID 생성
 function generateProjectId() {
@@ -30,50 +15,36 @@ function generateProjectId() {
 }
 
 exports.handler = async (event) => {
-  console.log('Event:', JSON.stringify(event, null, 2));
+  const origin = event.headers?.origin || event.headers?.Origin || '';
 
   // OPTIONS 요청 처리 (CORS preflight)
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  const preflightResponse = handlePreflight(event);
+  if (preflightResponse) {
+    return preflightResponse;
   }
 
   try {
-    // Authorization 헤더에서 토큰 추출
-    const authHeader = event.headers.Authorization || event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'No token provided' })
-      };
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'Invalid token' })
-      };
+    // 인증 확인
+    const { user, error: authError } = authenticateRequest(event);
+    if (authError) {
+      return response.unauthorized(authError, origin);
     }
 
     // 요청 본문 파싱
-    const body = JSON.parse(event.body);
+    const { data: body, error: parseError } = validation.parseJsonBody(event);
+    if (parseError) {
+      return response.error(parseError, origin, 400);
+    }
+
     const { projectName, location, area, rooms, bathrooms } = body;
 
     // 필수 필드 검증
-    if (!projectName || !location) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'projectName and location are required' })
-      };
+    const { valid, missingFields } = validation.validateRequiredFields(body, [
+      'projectName',
+      'location',
+    ]);
+    if (!valid) {
+      return response.error(`${missingFields.join(', ')} are required`, origin, 400);
     }
 
     // 프로젝트 데이터 생성
@@ -81,31 +52,30 @@ exports.handler = async (event) => {
     const now = new Date().toISOString();
 
     // userId를 String으로 변환 (DynamoDB 타입 불일치 방지)
-    const userId = String(decoded.userId);
+    const userId = String(user.userId);
 
     const project = {
       PK: `USER#${userId}`,
       SK: `PROJECT#${projectId}`,
       entityType: 'PROJECT',
-      userId: userId,  // String 타입으로 저장
-      projectId: projectId,
-      projectName: projectName,
-      location: location,
+      userId,
+      projectId,
+      projectName: validation.sanitizeString(projectName, 200),
+      location: validation.sanitizeString(location, 500),
       area: area || '',
       rooms: rooms || '',
       bathrooms: bathrooms || '',
       status: 'planning',
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
 
     // DynamoDB에 저장
-    await dynamodb.put({
+    const putCommand = new PutCommand({
       TableName: TABLE_NAME,
-      Item: project
-    }).promise();
-
-    console.log('Project created:', project);
+      Item: project,
+    });
+    await docClient.send(putCommand);
 
     // 응답 데이터 (PK, SK 제거)
     const responseProject = {
@@ -117,27 +87,19 @@ exports.handler = async (event) => {
       bathrooms: project.bathrooms,
       status: project.status,
       createdAt: project.createdAt,
-      updatedAt: project.updatedAt
+      updatedAt: project.updatedAt,
     };
 
-    return {
-      statusCode: 201,
-      headers,
-      body: JSON.stringify({
+    return response.created(
+      {
         message: 'Project created successfully',
-        project: responseProject
-      })
-    };
-
+        project: responseProject,
+      },
+      origin
+    );
   } catch (error) {
-    console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Internal server error',
-        message: error.message
-      })
-    };
+    console.error('CreateProject Error:', error.message);
+
+    return response.serverError('Internal server error', origin);
   }
 };

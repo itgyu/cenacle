@@ -5,36 +5,38 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, User, ArrowRight, FolderOpen } from 'lucide-react';
 import Image from 'next/image';
-import { getProjects } from '@/lib/projects-api';
+import { getProjects, Project } from '@/lib/projects-api';
+import { AuthGuard } from '@/components/AuthGuard';
+import { isAuthError } from '@/lib/errors';
 
-export default function DashboardPage() {
+interface DashboardStats {
+  totalProjects: number;
+  totalPhotos: number;
+  totalStyled: number;
+}
+
+function DashboardContent() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-  const [companyName, setCompanyName] = useState('인테리어 프로젝트 관리');
+  const [companyName] = useState('인테리어 프로젝트 관리');
   const [searchQuery, setSearchQuery] = useState('');
-  const [projects, setProjects] = useState<any[]>([]);
-  const [stats, setStats] = useState({
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
     totalPhotos: 0,
-    totalStyled: 0
+    totalStyled: 0,
   });
 
   // Load projects from API
   useEffect(() => {
     const loadProjects = async () => {
-      console.log('[Dashboard] Loading projects from API...');
       setIsLoadingProjects(true);
 
       const result = await getProjects();
 
       if (result.error) {
-        console.error('[Dashboard] Failed to load projects:', result.error);
-
         // If authentication error, redirect to login
-        if (result.error.includes('로그인') || result.error.includes('token') || result.error.includes('인증')) {
-          console.log('[Dashboard] Authentication error, redirecting to login...');
+        if (isAuthError(result.error)) {
           router.replace('/auth/login');
           return;
         }
@@ -44,57 +46,28 @@ export default function DashboardPage() {
       }
 
       if (result.data) {
-        console.log('[Dashboard] Projects loaded:', result.data.length);
         setProjects(result.data);
 
-        // Calculate stats - Note: API returns minimal project data
-        // For now, just set totalProjects
+        // Calculate stats
         setStats({
           totalProjects: result.data.length,
           totalPhotos: 0, // Not available in current API response
-          totalStyled: 0  // Not available in current API response
+          totalStyled: 0, // Not available in current API response
         });
       }
 
       setIsLoadingProjects(false);
     };
 
-    // Only load projects after authentication is confirmed
-    if (isAuthenticated) {
-      loadProjects();
-    }
-  }, [isAuthenticated, router]);
-
-  // Auth check
-  useEffect(() => {
-    console.log('[Dashboard] Checking authentication...');
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    console.log('[Dashboard] Token exists:', !!token);
-    console.log('[Dashboard] User exists:', !!user);
-
-    if (!token && !user) {
-      console.log('[Dashboard] Not authenticated, redirecting to login...');
-      router.replace('/auth/login');
-      return;
-    }
-
-    console.log('[Dashboard] Authenticated! Loading dashboard...');
-    setIsAuthenticated(true);
-    setIsLoading(false);
+    loadProjects();
   }, [router]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Filter projects by search query
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -118,7 +91,10 @@ export default function DashboardPage() {
 
             {/* 검색창 */}
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="search"
                 placeholder="진행중인 프로젝트명을 입력"
@@ -187,7 +163,11 @@ export default function DashboardPage() {
 
         {/* 프로젝트 리스트 */}
         <div className="px-5 py-4 pb-20 space-y-3">
-          {projects.length === 0 ? (
+          {isLoadingProjects ? (
+            <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-2 border-[#4b5840] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : filteredProjects.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -197,17 +177,23 @@ export default function DashboardPage() {
                 <FolderOpen size={32} className="text-[#4b5840]" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                첫 프로젝트를 시작해보세요
+                {searchQuery ? '검색 결과가 없습니다' : '첫 프로젝트를 시작해보세요'}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                새로운 인테리어 프로젝트로
-                <br />
-                완벽한 공간을 만들어보세요
+                {searchQuery ? (
+                  '다른 검색어를 입력해주세요'
+                ) : (
+                  <>
+                    새로운 인테리어 프로젝트로
+                    <br />
+                    완벽한 공간을 만들어보세요
+                  </>
+                )}
               </p>
             </motion.div>
           ) : (
             <AnimatePresence>
-              {projects.map((project, index) => (
+              {filteredProjects.map((project, index) => (
                 <motion.div
                   key={project.projectId}
                   initial={{ opacity: 0, y: 20 }}
@@ -228,13 +214,21 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="flex items-center">
-                      <div className={`w-2 h-2 rounded-full mr-2 ${
-                        project.status === 'active' ? 'bg-[#4b5840]' :
-                        project.status === 'completed' ? 'bg-green-500' : 'bg-gray-400'
-                      }`} />
+                      <div
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          project.status === 'active'
+                            ? 'bg-[#4b5840]'
+                            : project.status === 'completed'
+                              ? 'bg-green-500'
+                              : 'bg-gray-400'
+                        }`}
+                      />
                       <span className="text-xs text-gray-500">
-                        {project.status === 'active' ? '진행중' :
-                         project.status === 'completed' ? '완료' : '계획중'}
+                        {project.status === 'active'
+                          ? '진행중'
+                          : project.status === 'completed'
+                            ? '완료'
+                            : '계획중'}
                       </span>
                     </div>
                   </div>
@@ -272,5 +266,13 @@ export default function DashboardPage() {
         </motion.button>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <AuthGuard>
+      <DashboardContent />
+    </AuthGuard>
   );
 }

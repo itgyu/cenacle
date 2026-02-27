@@ -1,7 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { handlePreflight, generateToken, response, validation } = require('./shared');
 
 // DynamoDB 클라이언트 설정
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'eu-north-1' });
@@ -9,79 +9,55 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 // 환경 변수
 const TABLE_NAME = process.env.TABLE_NAME || 'users';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
+  const origin = event.headers?.origin || event.headers?.Origin || '';
 
   // OPTIONS 요청 처리 (CORS preflight)
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  const preflightResponse = handlePreflight(event);
+  if (preflightResponse) {
+    return preflightResponse;
   }
 
   try {
     // 요청 본문 파싱
-    const body = JSON.parse(event.body);
+    const { data: body, error: parseError } = validation.parseJsonBody(event);
+    if (parseError) {
+      return response.error(parseError, origin, 400);
+    }
+
     const { name, email, password, company, phone } = body;
 
     // 입력값 검증
-    if (!name || !email || !password) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: 'Name, email, and password are required'
-        })
-      };
+    const { valid, missingFields } = validation.validateRequiredFields(body, [
+      'name',
+      'email',
+      'password',
+    ]);
+    if (!valid) {
+      return response.error(`${missingFields.join(', ')} are required`, origin, 400);
     }
 
     // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: 'Invalid email format'
-        })
-      };
+    if (!validation.isValidEmail(email)) {
+      return response.error('Invalid email format', origin, 400);
     }
 
-    // 비밀번호 길이 검증
-    if (password.length < 6) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: 'Password must be at least 6 characters'
-        })
-      };
+    // 비밀번호 검증
+    const passwordValidation = validation.validatePassword(password);
+    if (!passwordValidation.valid) {
+      return response.error(passwordValidation.error, origin, 400);
     }
 
     // 이메일 중복 확인
     const getCommand = new GetCommand({
       TableName: TABLE_NAME,
-      Key: { email }
+      Key: { email },
     });
 
     const existingUser = await docClient.send(getCommand);
     if (existingUser.Item) {
-      return {
-        statusCode: 409,
-        headers,
-        body: JSON.stringify({
-          error: 'Email already exists'
-        })
-      };
+      return response.conflict('Email already exists', origin);
     }
 
     // 비밀번호 해싱
@@ -95,31 +71,27 @@ exports.handler = async (event) => {
     const newUser = {
       email,
       userId,
-      name,
+      name: validation.sanitizeString(name, 100),
       passwordHash,
-      company: company || null,
-      phone: phone || null,
+      company: company ? validation.sanitizeString(company, 200) : null,
+      phone: phone ? validation.sanitizeString(phone, 20) : null,
       createdAt: timestamp,
-      updatedAt: timestamp
+      updatedAt: timestamp,
     };
 
     // DynamoDB에 저장
     const putCommand = new PutCommand({
       TableName: TABLE_NAME,
-      Item: newUser
+      Item: newUser,
     });
 
     await docClient.send(putCommand);
 
     // JWT 토큰 생성
-    const token = jwt.sign(
-      {
-        userId: newUser.userId,
-        email: newUser.email
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = generateToken({
+      userId: newUser.userId,
+      email: newUser.email,
+    });
 
     // 응답용 사용자 정보 (passwordHash 제외)
     const userResponse = {
@@ -128,30 +100,21 @@ exports.handler = async (event) => {
       email: newUser.email,
       company: newUser.company,
       phone: newUser.phone,
-      createdAt: newUser.createdAt
+      createdAt: newUser.createdAt,
     };
 
     // 성공 응답
-    return {
-      statusCode: 201,
-      headers,
-      body: JSON.stringify({
+    return response.created(
+      {
         message: 'User created successfully',
         user: userResponse,
-        token
-      })
-    };
-
+        token,
+      },
+      origin
+    );
   } catch (error) {
-    console.error('Signup Error:', error);
+    console.error('Signup Error:', error.message);
 
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Internal server error',
-        message: error.message
-      })
-    };
+    return response.serverError('Internal server error', origin);
   }
 };

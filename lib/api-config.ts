@@ -1,5 +1,7 @@
+import { logger, isAuthError } from './errors';
+
 // API 기본 설정
-export const API_BASE_URL = 'https://s1pi302i06.execute-api.eu-north-1.amazonaws.com/prod';
+export const API_BASE_URL = 'https://su1m1ky0ib.execute-api.eu-north-1.amazonaws.com/prod';
 
 export const API_ENDPOINTS = {
   SIGNUP: '/signup',
@@ -7,15 +9,25 @@ export const API_ENDPOINTS = {
   PROFILE: '/profile',
 } as const;
 
-// API 요청 헬퍼 함수
+/**
+ * API Response type
+ */
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  code?: string;
+}
+
+/**
+ * API 요청 헬퍼 함수
+ */
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ data?: T; error?: string }> {
+): Promise<ApiResponse<T>> {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
-    console.log('[API Request]', url);
-    console.log('[API Options]', options);
+    logger.debug('API Request:', url);
 
     const response = await fetch(url, {
       ...options,
@@ -25,31 +37,35 @@ export async function apiRequest<T>(
       },
     });
 
-    console.log('[API Response Status]', response.status);
+    logger.debug('API Response Status:', response.status);
     const data = await response.json();
-    console.log('[API Response Data]', data);
 
     if (!response.ok) {
       // 실제 API는 error 필드로 에러 메시지 전달
-      return { error: data.error || data.message || '요청 처리 중 오류가 발생했습니다.' };
+      return {
+        error: data.error || data.message || '요청 처리 중 오류가 발생했습니다.',
+        code: data.code,
+      };
     }
 
     return { data };
   } catch (error) {
-    console.error('API Request Error:', error);
+    logger.error('API Request Error:', error);
     return { error: '네트워크 오류가 발생했습니다.' };
   }
 }
 
-// 인증이 필요한 API 요청
+/**
+ * 인증이 필요한 API 요청
+ */
 export async function authenticatedApiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ data?: T; error?: string }> {
-  const token = localStorage.getItem('token');
+): Promise<ApiResponse<T>> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   if (!token) {
-    return { error: '로그인이 필요합니다.' };
+    return { error: '로그인이 필요합니다.', code: 'UNAUTHORIZED' };
   }
 
   return apiRequest<T>(endpoint, {
@@ -59,4 +75,19 @@ export async function authenticatedApiRequest<T>(
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+/**
+ * Check if response indicates auth error and handle accordingly
+ */
+export function handleApiError(
+  error: string,
+  router: { replace: (path: string) => void }
+): boolean {
+  if (isAuthError(error)) {
+    logger.info('Authentication error detected, redirecting to login');
+    router.replace('/auth/login');
+    return true;
+  }
+  return false;
 }
