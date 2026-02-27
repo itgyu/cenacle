@@ -1,14 +1,19 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Building2 } from "lucide-react"
 
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Townus</span>
+          <Image
+            src="/images/cenacle_logo.png"
+            alt="세나클디자인"
+            width={120}
+            height={40}
+            className="h-8 w-auto"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -25,20 +30,20 @@ export function Header() {
             서비스
           </Link>
           <Link
-            href="#help"
+            href="#portfolio"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            도움센터
+            포트폴리오
           </Link>
           <Link
-            href="#blog"
+            href="#contact"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            블로그
+            문의하기
           </Link>
         </nav>
 
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">무료 체험</Button>
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">상담 신청</Button>
       </div>
     </header>
   )

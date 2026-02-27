@@ -1,17 +1,18 @@
 export function Footer() {
   return (
-    <footer className="bg-black text-white py-12">
+    <footer className="bg-[#3c3733] text-white py-12">
       <div className="container">
         <div className="mb-8">
-          <h3 className="text-lg font-bold mb-2">타운어스 (Townus)</h3>
-          <p className="text-sm text-gray-400">우리 동네, 우리가 만드는 공간 &gt;</p>
+          <h3 className="text-lg font-bold mb-2">세나클디자인스튜디오</h3>
+          <p className="text-sm text-gray-300">공간의 가치를 디자인합니다</p>
         </div>
 
-        <div className="text-sm text-gray-400 space-y-1 mb-8">
-          <p>이메일: contact@townus.co.kr</p>
+        <div className="text-sm text-gray-300 space-y-1 mb-8">
+          <p>이메일: cenacledesign@naver.com</p>
+          <p>웹사이트: cenacledesign.com</p>
         </div>
 
-        <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8">
+        <div className="flex flex-wrap gap-6 text-sm text-gray-300 mb-8">
           <a href="#" className="hover:text-white transition-colors">
             개인정보처리방침
           </a>
@@ -23,7 +24,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="text-xs text-gray-500">© 2025 Townus. All rights reserved.</div>
+        <div className="text-xs text-gray-400">© 2025 CENACLE DESIGN STUDIO. All rights reserved.</div>
       </div>
     </footer>
   )

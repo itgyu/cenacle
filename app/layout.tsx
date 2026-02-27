@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Keystone Partners",
-  description: "토스 수준의 UX를 제공하는 Next.js 애플리케이션",
+  title: "세나클디자인스튜디오 | CENACLE DESIGN STUDIO",
+  description: "공간의 가치를 디자인합니다. 세나클디자인스튜디오에서 당신만의 특별한 인테리어를 경험하세요.",
   icons: {
     icon: "/favicon.ico",
   },
