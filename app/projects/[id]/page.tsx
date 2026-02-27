@@ -9,8 +9,6 @@ import { TABS, DEFAULT_SPACES } from './constants';
 import BeforeTab from './components/BeforeTab';
 import AfterTab from './components/AfterTab';
 import StylingTab from './components/StylingTab';
-import EditingTab from './components/EditingTab';
-import ReleaseTab from './components/ReleaseTab';
 import PhotoGallery from './components/PhotoGallery';
 import { getProject, uploadPhoto } from '@/lib/projects-api';
 
@@ -29,8 +27,6 @@ export default function ProjectDetailPage() {
     bathroom: false,
   });
   const [showStylingGuide, setShowStylingGuide] = useState(false);
-  const [showEditingGuide, setShowEditingGuide] = useState(false);
-  const [showReleaseGuide, setShowReleaseGuide] = useState(false);
   const [showPhotoGallery, setShowPhotoGallery] = useState(false);
   const [showProjectInfo, setShowProjectInfo] = useState(false);
 
@@ -39,14 +35,6 @@ export default function ProjectDetailPage() {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>('modern');
   const [isStyling, setIsStyling] = useState(false);
-
-  // 에디팅 관련 상태
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [editingSelectedPhoto, setEditingSelectedPhoto] = useState<string | null>(null);
-  const [editingSelectedPhotoId, setEditingSelectedPhotoId] = useState<string | null>(null);
-  const [editingConcept, setEditingConcept] = useState<string>('modern');
-  const [editingColor, setEditingColor] = useState<string>('white');
-  const [isEditing, setIsEditing] = useState(false);
 
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -227,65 +215,6 @@ export default function ProjectDetailPage() {
     // TODO: API로 DynamoDB 업데이트하는 기능 추가 필요
   };
 
-  // AI 에디팅 생성
-  const handleAIEdit = async () => {
-    if (!project) return;
-
-    setIsGenerating(true);
-
-    try {
-      const response = await fetch('/api/edit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          projectName: project.projectName,
-          location: project.location,
-          area: project.area,
-          rooms: project.rooms,
-          bathrooms: project.bathrooms,
-          concept: editingConcept,
-          color: editingColor,
-        }),
-      });
-
-      const data = await response.json();
-      console.log('API 응답:', data);
-
-      if (data.success) {
-        const updatedProject = {
-          ...project,
-          editingContent: {
-            blog: data.blog,
-            instagram: data.instagram,
-            hashtags: data.hashtags,
-          },
-          updatedAt: new Date().toISOString(),
-        };
-
-        console.log('[AIEdit] Updated project:', updatedProject);
-        setProject(updatedProject);
-        console.log('[AIEdit] Project state updated successfully (local state only)');
-
-        // TODO: API로 DynamoDB 업데이트하는 기능 추가 필요
-      } else {
-        console.error('[AIEdit] API 응답 실패:', data);
-      }
-    } catch (error) {
-      console.error('AI 에디팅 오류:', error);
-      alert('AI 에디팅 중 오류가 발생했습니다.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // 복사 기능
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('클립보드에 복사되었습니다.');
-  };
-
   // 프로젝트 삭제 기능
   const handleDeleteProject = () => {
     if (!project) return;
@@ -414,33 +343,6 @@ export default function ProjectDetailPage() {
             isStyling={isStyling}
             handleAIStyling={handleAIStyling}
             setProject={setProject}
-          />
-        );
-      case 4: // 에디팅
-        return (
-          <EditingTab
-            project={project}
-            showEditingGuide={showEditingGuide}
-            setShowEditingGuide={setShowEditingGuide}
-            editingSelectedPhoto={editingSelectedPhoto}
-            setEditingSelectedPhoto={setEditingSelectedPhoto}
-            editingConcept={editingConcept}
-            setEditingConcept={setEditingConcept}
-            editingColor={editingColor}
-            setEditingColor={setEditingColor}
-            isGenerating={isGenerating}
-            handleAIEdit={handleAIEdit}
-            handleCopy={handleCopy}
-          />
-        );
-      case 5: // 릴리즈
-        return (
-          <ReleaseTab
-            project={project}
-            showReleaseGuide={showReleaseGuide}
-            setShowReleaseGuide={setShowReleaseGuide}
-            setActiveTab={setActiveTab}
-            handleCopy={handleCopy}
           />
         );
       default:

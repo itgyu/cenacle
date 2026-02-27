@@ -1,8 +1,8 @@
 export interface StylingPhoto {
-  originalPhoto: string;  // 원본 사진
-  styledPhoto: string;    // 스타일링된 사진
-  style: string;          // 사용한 스타일
-  createdAt: string;      // 생성 시간
+  originalPhoto: string; // 원본 사진
+  styledPhoto: string; // 스타일링된 사진
+  style: string; // 사용한 스타일
+  createdAt: string; // 생성 시간
 }
 
 export interface Project {
@@ -17,9 +17,9 @@ export interface Project {
   currentStep: number;
   createdAt: string;
   updatedAt: string;
-  beforePhotos: Record<string, Record<string, string>>;  // spaceId -> shotId -> base64
-  afterPhotos: Record<string, Record<string, string>>;   // spaceId -> shotId -> base64
-  stylingPhotos: Record<string, string | StylingPhoto>;  // photoId -> styled base64 (legacy) or StylingPhoto object
+  beforePhotos: Record<string, Record<string, string>>; // spaceId -> shotId -> base64
+  afterPhotos: Record<string, Record<string, string>>; // spaceId -> shotId -> base64
+  stylingPhotos: Record<string, string | StylingPhoto>; // photoId -> styled base64 (legacy) or StylingPhoto object
   aiStylePhotos: any[];
   spaces: any[];
   content: {
@@ -27,11 +27,6 @@ export interface Project {
     description: string;
     hashtags: string[];
     channels: string[];
-  };
-  editingContent?: {
-    blog: string;
-    instagram: string;
-    hashtags: string;
   };
 }
 
@@ -51,16 +46,4 @@ export interface Space {
 export interface Tab {
   id: number;
   name: string;
-}
-
-export interface ConceptOption {
-  id: string;
-  name: string;
-  desc: string;
-}
-
-export interface ColorOption {
-  id: string;
-  name: string;
-  desc: string;
 }
