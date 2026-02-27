@@ -45,24 +45,23 @@ export interface ProfileResponse {
 }
 
 /**
- * Save auth data to localStorage
+ * Save auth token to localStorage
+ * Note: Only token is stored locally, user data is fetched from API
  */
-function saveAuthData(token: string, user: User): void {
+function saveAuthToken(token: string): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    logger.debug('Auth data saved');
+    logger.debug('Auth token saved');
   }
 }
 
 /**
- * Clear auth data from localStorage
+ * Clear auth token from localStorage
  */
-function clearAuthData(): void {
+function clearAuthToken(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    logger.debug('Auth data cleared');
+    logger.debug('Auth token cleared');
   }
 }
 
@@ -79,9 +78,9 @@ export async function signup(signupData: SignupData) {
     return { error: getUserFriendlyMessage(error || '회원가입에 실패했습니다.') };
   }
 
-  // 토큰과 사용자 정보 저장
+  // 토큰만 저장 (사용자 정보는 AWS에서 관리)
   if (data.token) {
-    saveAuthData(data.token, data.user);
+    saveAuthToken(data.token);
   }
 
   return { data: { user: data.user, token: data.token } };
@@ -103,9 +102,9 @@ export async function login(loginData: LoginData) {
     return { error: getUserFriendlyMessage(error || '로그인에 실패했습니다.') };
   }
 
-  // 토큰과 사용자 정보 저장
+  // 토큰만 저장 (사용자 정보는 AWS에서 관리)
   if (data.token) {
-    saveAuthData(data.token, data.user);
+    saveAuthToken(data.token);
     logger.debug('Login successful');
   }
 
@@ -122,11 +121,7 @@ export async function getProfile() {
     return { error: getUserFriendlyMessage(error || '프로필 조회에 실패했습니다.') };
   }
 
-  // 사용자 정보 업데이트
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('user', JSON.stringify(data.data.user));
-  }
-
+  // 사용자 정보는 localStorage에 저장하지 않고 반환만 함
   return { data: data.data.user };
 }
 
@@ -134,27 +129,30 @@ export async function getProfile() {
  * 로그아웃
  */
 export function logout() {
-  clearAuthData();
+  clearAuthToken();
 }
 
 /**
  * 현재 로그인된 사용자 정보 가져오기
+ * Note: 이 함수는 deprecated. 대신 getProfile() API를 사용하세요.
  */
-export function getCurrentUser(): User | null {
+export async function getCurrentUser(): Promise<User | null> {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  const userStr = localStorage.getItem('user');
-  if (!userStr) {
+  const token = localStorage.getItem('token');
+  if (!token) {
     return null;
   }
 
-  try {
-    return JSON.parse(userStr);
-  } catch {
+  // API에서 사용자 정보 조회
+  const { data, error } = await getProfile();
+  if (error || !data) {
     return null;
   }
+
+  return data;
 }
 
 /**

@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Building2, MapPin, Maximize2, Home } from 'lucide-react';
 import { createProject as createProjectAPI } from '@/lib/projects-api';
+import { isAuthenticated } from '@/lib/auth-api';
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState('');
   const [formState, setFormState] = useState({
     step: 1,
     projectName: '',
@@ -17,30 +17,12 @@ export default function CreateProjectPage() {
     rooms: '',
     bathrooms: '',
     isLoading: false,
-    error: ''
+    error: '',
   });
 
   // Auth check
   useEffect(() => {
-    console.log('[CreateProject] Checking authentication...');
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    console.log('[CreateProject] Token exists:', !!token);
-    console.log('[CreateProject] User exists:', !!user);
-
-    if (!token || !user) {
-      console.log('[CreateProject] Not authenticated, redirecting to login...');
-      router.push('/auth/login');
-      return;
-    }
-
-    try {
-      const userData = JSON.parse(user);
-      console.log('[CreateProject] User data:', userData);
-      setUserEmail(userData.email || '');
-      console.log('[CreateProject] Authenticated! Email:', userData.email);
-    } catch (error) {
-      console.error('[CreateProject] Error parsing user data:', error);
+    if (!isAuthenticated()) {
       router.push('/auth/login');
     }
   }, [router]);
@@ -65,31 +47,31 @@ export default function CreateProjectPage() {
 
     // Validation
     if (step === 1 && !projectName.trim()) {
-      setFormState(prev => ({ ...prev, error: '프로젝트명을 입력해주세요.' }));
+      setFormState((prev) => ({ ...prev, error: '프로젝트명을 입력해주세요.' }));
       return;
     }
     if (step === 2 && !location.trim()) {
-      setFormState(prev => ({ ...prev, error: '위치를 입력해주세요.' }));
+      setFormState((prev) => ({ ...prev, error: '위치를 입력해주세요.' }));
       return;
     }
     if (step === 3 && !area.trim()) {
-      setFormState(prev => ({ ...prev, error: '평수를 입력해주세요.' }));
+      setFormState((prev) => ({ ...prev, error: '평수를 입력해주세요.' }));
       return;
     }
     if (step === 4 && (!rooms.trim() || !bathrooms.trim())) {
-      setFormState(prev => ({ ...prev, error: '방과 욕실 개수를 입력해주세요.' }));
+      setFormState((prev) => ({ ...prev, error: '방과 욕실 개수를 입력해주세요.' }));
       return;
     }
 
     if (step < 4) {
-      setFormState(prev => ({ ...prev, step: prev.step + 1, error: '' }));
+      setFormState((prev) => ({ ...prev, step: prev.step + 1, error: '' }));
     } else {
       createProject();
     }
   };
 
   const createProject = async () => {
-    setFormState(prev => ({ ...prev, isLoading: true, error: '' }));
+    setFormState((prev) => ({ ...prev, isLoading: true, error: '' }));
 
     console.log('[CreateProject] Creating project via API...');
 
@@ -99,7 +81,7 @@ export default function CreateProjectPage() {
       location: formState.location.trim(),
       area: formState.area,
       rooms: formState.rooms,
-      bathrooms: formState.bathrooms
+      bathrooms: formState.bathrooms,
     });
 
     // Handle API error
@@ -107,16 +89,20 @@ export default function CreateProjectPage() {
       console.error('[CreateProject] API error:', result.error);
 
       // Check if it's an authentication error
-      if (result.error.includes('로그인') || result.error.includes('token') || result.error.includes('인증')) {
+      if (
+        result.error.includes('로그인') ||
+        result.error.includes('token') ||
+        result.error.includes('인증')
+      ) {
         console.log('[CreateProject] Authentication error, redirecting to login...');
         router.replace('/auth/login');
         return;
       }
 
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         error: result.error,
-        isLoading: false
+        isLoading: false,
       }));
       return;
     }
@@ -137,7 +123,7 @@ export default function CreateProjectPage() {
 
   const handleBack = () => {
     if (formState.step > 1) {
-      setFormState(prev => ({ ...prev, step: prev.step - 1, error: '' }));
+      setFormState((prev) => ({ ...prev, step: prev.step - 1, error: '' }));
     } else {
       router.push('/dashboard');
     }
@@ -159,17 +145,15 @@ export default function CreateProjectPage() {
               <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Building2 size={32} className="text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                프로젝트명을 입력해주세요
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900">프로젝트명을 입력해주세요</h2>
               <p className="text-gray-600">어떤 공간을 만들어볼까요?</p>
             </div>
             <input
               type="text"
               placeholder="우리집 리모델링"
               value={formState.projectName}
-              onChange={e =>
-                setFormState(prev => ({ ...prev, projectName: e.target.value, error: '' }))
+              onChange={(e) =>
+                setFormState((prev) => ({ ...prev, projectName: e.target.value, error: '' }))
               }
               onKeyPress={handleKeyPress}
               className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
@@ -204,8 +188,8 @@ export default function CreateProjectPage() {
               type="text"
               placeholder="강남구 역삼동"
               value={formState.location}
-              onChange={e =>
-                setFormState(prev => ({ ...prev, location: e.target.value, error: '' }))
+              onChange={(e) =>
+                setFormState((prev) => ({ ...prev, location: e.target.value, error: '' }))
               }
               onKeyPress={handleKeyPress}
               className={`w-full px-4 py-4 text-lg h-14 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
@@ -233,9 +217,7 @@ export default function CreateProjectPage() {
               <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Maximize2 size={32} className="text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                평수를 입력해주세요
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900">평수를 입력해주세요</h2>
               <p className="text-gray-600">전용면적 기준으로 입력해주세요</p>
             </div>
             <div className="relative">
@@ -243,8 +225,8 @@ export default function CreateProjectPage() {
                 type="number"
                 placeholder="32"
                 value={formState.area}
-                onChange={e =>
-                  setFormState(prev => ({ ...prev, area: e.target.value, error: '' }))
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, area: e.target.value, error: '' }))
                 }
                 onKeyPress={handleKeyPress}
                 className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
@@ -276,23 +258,19 @@ export default function CreateProjectPage() {
               <div className="w-16 h-16 bg-[#4b5840] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Home size={32} className="text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                공간 구성을 알려주세요
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900">공간 구성을 알려주세요</h2>
               <p className="text-gray-600">방과 욕실 개수를 입력해주세요</p>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  방
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">방</label>
                 <div className="relative">
                   <input
                     type="number"
                     placeholder="3"
                     value={formState.rooms}
-                    onChange={e =>
-                      setFormState(prev => ({ ...prev, rooms: e.target.value, error: '' }))
+                    onChange={(e) =>
+                      setFormState((prev) => ({ ...prev, rooms: e.target.value, error: '' }))
                     }
                     onKeyPress={handleKeyPress}
                     className={`w-full px-4 py-4 text-lg h-14 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4b5840] focus:border-transparent transition-all ${
@@ -306,19 +284,17 @@ export default function CreateProjectPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  욕실
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">욕실</label>
                 <div className="relative">
                   <input
                     type="number"
                     placeholder="2"
                     value={formState.bathrooms}
-                    onChange={e =>
-                      setFormState(prev => ({
+                    onChange={(e) =>
+                      setFormState((prev) => ({
                         ...prev,
                         bathrooms: e.target.value,
-                        error: ''
+                        error: '',
                       }))
                     }
                     onKeyPress={handleKeyPress}

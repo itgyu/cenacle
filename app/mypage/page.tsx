@@ -17,6 +17,7 @@ import {
   X,
   LucideIcon,
 } from 'lucide-react';
+import { getProfile, logout as authLogout } from '@/lib/auth-api';
 
 interface UserProfile {
   name: string;
@@ -44,27 +45,23 @@ export default function MyPage() {
         return;
       }
 
-      // 사용자 정보 로드 (auth-api에서 저장하는 'user' 키 사용)
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        try {
-          const userData = JSON.parse(userStr);
-          setUserProfile({
-            name: userData.name || '',
-            email: userData.email || '',
-            company: userData.company || '',
-            phone: userData.phone || '',
-          });
-        } catch (e) {
-          console.error('사용자 데이터 파싱 오류:', e);
-          router.push('/auth/login');
-        }
-      } else {
-        // user 데이터가 없으면 로그인 페이지로
+      // AWS API에서 사용자 정보 조회
+      const { data, error } = await getProfile();
+      if (error || !data) {
+        console.error('프로필 조회 실패:', error);
         router.push('/auth/login');
+        return;
       }
+
+      setUserProfile({
+        name: data.name || '',
+        email: data.email || '',
+        company: data.company || '',
+        phone: data.phone || '',
+      });
     } catch (e) {
       console.error('프로필 로드 오류:', e);
+      router.push('/auth/login');
     } finally {
       setIsLoading(false);
     }
@@ -84,17 +81,12 @@ export default function MyPage() {
     setIsEditMode(false);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editProfile) return;
 
-    // localStorage 업데이트
-    const keystoneUser = {
-      name: editProfile.name,
-      email: editProfile.email,
-      company: editProfile.company,
-      phone: editProfile.phone,
-    };
-    localStorage.setItem('keystoneUser', JSON.stringify(keystoneUser));
+    // TODO: AWS API로 프로필 업데이트 구현
+    // 현재는 UI만 업데이트 (서버에는 저장되지 않음)
+    // 추후 PUT /profile API 구현 필요
 
     // 상태 업데이트
     setUserProfile(editProfile);
@@ -363,8 +355,7 @@ export default function MyPage() {
                     </button>
                     <button
                       onClick={() => {
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
+                        authLogout();
                         router.push('/auth/login');
                       }}
                       className="flex-1 px-4 py-3 bg-red-600 rounded-xl font-medium text-white hover:bg-red-700 transition-colors"

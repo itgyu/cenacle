@@ -31,3 +31,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.github/workflows/
+lambda-layer/*.zip
+lambda-layer/deploy/

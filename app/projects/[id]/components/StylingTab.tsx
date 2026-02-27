@@ -39,16 +39,18 @@ export default function StylingTab({
   setSelectedStyle,
   isStyling,
   handleAIStyling,
-  setProject
+  setProject,
 }: StylingTabProps) {
-  const [compareView, setCompareView] = useState<{ photoId: string; data: StylingPhoto } | null>(null);
+  const [compareView, setCompareView] = useState<{ photoId: string; data: StylingPhoto } | null>(
+    null
+  );
   const [sliderPosition, setSliderPosition] = useState(50);
 
   const styleNames: Record<string, string> = {
     modern: '모던',
     minimal: '미니멀',
     nordic: '북유럽',
-    classic: '클래식'
+    classic: '클래식',
   };
 
   return (
@@ -61,8 +63,18 @@ export default function StylingTab({
         >
           <div className="flex items-start gap-2.5">
             <div className="w-5 h-5 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-3 h-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <div className="text-left">
@@ -70,7 +82,10 @@ export default function StylingTab({
               <p className="text-xs text-[#4b5840]">이용 방법을 확인해보세요</p>
             </div>
           </div>
-          <ChevronDown size={18} className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showStylingGuide ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            size={18}
+            className={`text-[#4b5840] transition-transform flex-shrink-0 mt-0.5 ${showStylingGuide ? 'rotate-180' : ''}`}
+          />
         </button>
 
         <AnimatePresence>
@@ -86,8 +101,18 @@ export default function StylingTab({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-[#4b5840]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      <svg
+                        className="w-5 h-5 text-[#4b5840]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                        />
                       </svg>
                     </div>
                     <h4 className="text-sm font-bold text-gray-900">AI 스타일링 가이드</h4>
@@ -131,13 +156,27 @@ export default function StylingTab({
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <div className="flex items-start gap-2">
               <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-3 h-3 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-0.5">사진 보관함에 저장되었습니다</p>
-                <p className="text-xs text-gray-600">우측 상단의 폴더 아이콘을 눌러 보관함을 확인하세요</p>
+                <p className="text-sm font-semibold text-gray-900 mb-0.5">
+                  사진 보관함에 저장되었습니다
+                </p>
+                <p className="text-xs text-gray-600">
+                  우측 상단의 폴더 아이콘을 눌러 보관함을 확인하세요
+                </p>
               </div>
             </div>
           </div>
@@ -151,9 +190,8 @@ export default function StylingTab({
             {Object.entries(project.stylingPhotos).map(([photoId, styledData]) => {
               const isNewFormat = isStylingPhotoObject(styledData);
               const displayImage = isNewFormat ? styledData.styledPhoto : styledData;
-              const createdDate = isNewFormat && styledData.createdAt
-                ? new Date(styledData.createdAt)
-                : null;
+              const createdDate =
+                isNewFormat && styledData.createdAt ? new Date(styledData.createdAt) : null;
 
               return (
                 <div
@@ -181,7 +219,10 @@ export default function StylingTab({
                     {isNewFormat && createdDate && (
                       <div className="absolute top-2 right-2">
                         <span className="bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-md text-xs">
-                          {createdDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                          {createdDate.toLocaleDateString('ko-KR', {
+                            month: 'short',
+                            day: 'numeric',
+                          })}
                         </span>
                       </div>
                     )}
@@ -210,16 +251,11 @@ export default function StylingTab({
                         const updatedProject = {
                           ...project,
                           stylingPhotos: updatedStylingPhotos,
-                          updatedAt: new Date().toISOString()
+                          updatedAt: new Date().toISOString(),
                         };
 
-                        const projects = JSON.parse(localStorage.getItem('keystone-projects') || '[]');
-                        const projectIndex = projects.findIndex((p: Project) => p.id === project.id);
-                        if (projectIndex !== -1) {
-                          projects[projectIndex] = updatedProject;
-                          localStorage.setItem('keystone-projects', JSON.stringify(projects));
-                          setProject(updatedProject);
-                        }
+                        // 프로젝트 상태 업데이트 (AWS API를 통해 저장됨)
+                        setProject(updatedProject);
                       }}
                       className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-lg"
                     >
@@ -309,8 +345,18 @@ export default function StylingTab({
                       style={{ left: `${sliderPosition}%` }}
                     >
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        <svg
+                          className="w-6 h-6 text-gray-700"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 9l4-4 4 4m0 6l-4 4-4-4"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -399,26 +445,42 @@ export default function StylingTab({
                   disabled={!hasAfterPhotos}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      hasAfterPhotos ? 'bg-gray-100' : 'bg-gray-200'
-                    }`}>
-                      <space.icon size={24} className={hasAfterPhotos ? 'text-gray-600' : 'text-gray-400'} />
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                        hasAfterPhotos ? 'bg-gray-100' : 'bg-gray-200'
+                      }`}
+                    >
+                      <space.icon
+                        size={24}
+                        className={hasAfterPhotos ? 'text-gray-600' : 'text-gray-400'}
+                      />
                     </div>
                     <div className="text-left">
-                      <h4 className={`text-sm font-semibold ${hasAfterPhotos ? 'text-gray-900' : 'text-gray-400'}`}>
+                      <h4
+                        className={`text-sm font-semibold ${hasAfterPhotos ? 'text-gray-900' : 'text-gray-400'}`}
+                      >
                         {space.name}
                       </h4>
                       <p className="text-xs text-gray-500 mt-0.5">
                         {hasAfterPhotos
                           ? `업로드 된 시공 후 사진 ${afterPhotoCount}개`
-                          : '업로드 된 시공 후 사진이 없습니다'
-                        }
+                          : '업로드 된 시공 후 사진이 없습니다'}
                       </p>
                     </div>
                   </div>
                   {hasAfterPhotos && (
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   )}
                 </button>
@@ -445,13 +507,15 @@ export default function StylingTab({
           <div className="bg-[#f5f3ef] border border-blue-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                {DEFAULT_SPACES.find(s => s.id === selectedSpace)?.icon &&
-                  React.createElement(DEFAULT_SPACES.find(s => s.id === selectedSpace)!.icon, { size: 20, className: 'text-[#4b5840]' })
-                }
+                {DEFAULT_SPACES.find((s) => s.id === selectedSpace)?.icon &&
+                  React.createElement(DEFAULT_SPACES.find((s) => s.id === selectedSpace)!.icon, {
+                    size: 20,
+                    className: 'text-[#4b5840]',
+                  })}
               </div>
               <div>
                 <h3 className="font-semibold text-sm text-gray-900">
-                  {DEFAULT_SPACES.find(s => s.id === selectedSpace)?.name}
+                  {DEFAULT_SPACES.find((s) => s.id === selectedSpace)?.name}
                 </h3>
                 <p className="text-xs text-gray-600">사진을 선택하고 원하는 스타일을 적용하세요</p>
               </div>
@@ -483,8 +547,7 @@ export default function StylingTab({
                         className="w-full h-full object-cover"
                       />
                     </button>
-                  ))
-              }
+                  ))}
             </div>
           </div>
 
@@ -497,7 +560,7 @@ export default function StylingTab({
                   { id: 'modern', name: '모던' },
                   { id: 'minimal', name: '미니멀' },
                   { id: 'nordic', name: '북유럽' },
-                  { id: 'classic', name: '클래식' }
+                  { id: 'classic', name: '클래식' },
                 ].map((style) => (
                   <button
                     key={style.id}
@@ -542,12 +605,24 @@ export default function StylingTab({
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#4b5840] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        className="w-6 h-6 text-white animate-spin"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-900">AI가 인테리어를 재구성하고 있습니다</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        AI가 인테리어를 재구성하고 있습니다
+                      </p>
                       <p className="text-xs text-gray-600 mt-0.5">약 30초~2분 정도 소요됩니다</p>
                     </div>
                   </div>
@@ -570,9 +645,7 @@ export default function StylingTab({
 
                   {/* 안내 메시지 */}
                   <div className="pt-3 border-t border-blue-200">
-                    <p className="text-xs text-gray-600 text-center">
-                      ⚠️ 페이지를 벗어나지 마세요
-                    </p>
+                    <p className="text-xs text-gray-600 text-center">⚠️ 페이지를 벗어나지 마세요</p>
                   </div>
                 </motion.div>
               )}

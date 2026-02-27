@@ -36,7 +36,6 @@ export const test = base.extend<{
     // Cleanup: logout after test
     await page.evaluate(() => {
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
     });
   },
 });
