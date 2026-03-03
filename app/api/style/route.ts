@@ -265,7 +265,7 @@ async function generateStylingPrompt(
       {
         parts: [
           {
-            text: `ROLE: Interior Decorator (ADD-ONLY styling).
+            text: `ROLE: Professional Interior Stager.
 
 [CURRENT ROOM ANALYSIS]:
 ${analysisText}
@@ -273,35 +273,73 @@ ${analysisText}
 [TARGET STYLE]:
 ${styleName} (${stylePrompt})
 
-[CRITICAL CONCEPT - UNDERSTAND THIS]:
-This is "STAGING" or "DECORATING" - NOT "REDESIGNING".
-The original room must remain 100% IDENTICAL.
-We are ONLY ADDING decorative items to EMPTY SPACES.
+[CORE PRINCIPLE - STAGING]:
+This is "PROFESSIONAL STAGING" - making spaces look lived-in and complete.
+Keep ALL existing furniture, flooring, walls exactly as they are.
+But ACTIVELY ADD missing elements to make the space feel complete and stylish.
 
-[ABSOLUTE PRESERVATION RULES]:
-🚫 NEVER change, move, replace, or alter ANY existing item:
-   - Existing furniture (sofas, tables, chairs, beds) → KEEP AS-IS
-   - Existing flooring (hardwood, tiles, carpet) → KEEP AS-IS
-   - Existing walls and paint colors → KEEP AS-IS
-   - Existing curtains, blinds → KEEP AS-IS
-   - Existing lighting fixtures → KEEP AS-IS
-   - Existing artwork, frames → KEEP AS-IS
+[PRESERVATION RULES - DO NOT CHANGE]:
+🚫 Existing furniture (sofas, tables, chairs, beds) → KEEP position, color, style
+🚫 Flooring material and color → KEEP AS-IS
+🚫 Wall color and texture → KEEP AS-IS
+🚫 Window frames and structure → KEEP AS-IS
 
-[WHAT YOU CAN ADD - IN EMPTY SPACES ONLY]:
-✅ Small decorative plants (on empty table corners, empty floor corners)
-✅ Throw pillows (on sofas that have empty space)
-✅ Small decorative objects (vases, candles, books - on empty surfaces)
-✅ A small rug (only if floor is completely bare)
-✅ Wall art (only on completely empty walls)
+[ACTIVE STAGING - ADD GENEROUSLY]:
+Look at what the room is MISSING and add it:
+
+📺 ELECTRONICS & APPLIANCES (if missing):
+   - TV on empty TV stand or wall mount
+   - Speakers, sound bar
+   - Air purifier, humidifier in corners
+
+🪴 PLANTS & GREENERY (be generous):
+   - Large floor plants in empty corners (fiddle leaf fig, monstera)
+   - Medium plants on shelves and surfaces
+   - Small succulents and herbs
+   - Hanging plants if ceiling allows
+
+🛋️ SOFT FURNISHINGS:
+   - Multiple throw pillows on sofas/beds (3-5 pillows)
+   - Cozy blankets draped on furniture
+   - Area rugs under furniture or in bare areas
+   - Curtains/drapes if windows are bare
+
+🎨 WALL DECOR (fill empty walls):
+   - Large artwork or gallery wall arrangements
+   - Mirrors to add depth
+   - Wall shelves with decorations
+   - Clock, wall hangings
+
+💡 LIGHTING:
+   - Floor lamps in dark corners
+   - Table lamps on side tables
+   - Pendant lights or chandeliers if ceiling is bare
+
+📚 DECORATIVE OBJECTS:
+   - Books and magazines stacked artfully
+   - Vases with flowers or dried arrangements
+   - Candles and candle holders
+   - Decorative bowls, trays, sculptures
+   - Photo frames
+
+🍽️ IF DINING/KITCHEN AREA:
+   - Table setting (plates, glasses, napkins)
+   - Centerpiece
+   - Fruit bowl
+
+🛏️ IF BEDROOM:
+   - Layered bedding, multiple pillows
+   - Bedside lamps
+   - Nightstand accessories
 
 [OUTPUT]:
-Write a prompt describing ONLY what small decorative items to ADD to empty spaces.
-Do NOT describe any changes to existing items.`,
+Write a detailed prompt describing ALL items to ADD to make this room look professionally staged.
+Be specific about placement and quantity. Make the room feel COMPLETE and INVITING.`,
           },
         ],
       },
     ],
-    generationConfig: { temperature: 0.3 },
+    generationConfig: { temperature: 0.4 },
   };
 
   const response = await callGemini(
@@ -316,7 +354,7 @@ Do NOT describe any changes to existing items.`,
 
   if (!promptText) {
     // 기본 프롬프트 반환
-    return `Add small ${styleName} style decorative items (plants, pillows, small decor) to empty spaces only. Keep ALL existing furniture, flooring, walls, and items exactly the same.`;
+    return `Professionally stage this room in ${styleName} style. Add: large plants in corners, multiple throw pillows, cozy blankets, area rug, wall art, floor lamp, table lamps, books, vases with flowers, decorative objects. Keep all existing furniture unchanged.`;
   }
 
   console.log('Prompt generated:', promptText.substring(0, 100) + '...');
@@ -339,43 +377,63 @@ async function generateStyledImage(
       {
         parts: [
           {
-            text: `TASK: Interior Staging - ADD decorative items ONLY (DO NOT CHANGE ANYTHING)
+            text: `TASK: Professional Interior Staging - Make this room look COMPLETE and INVITING
 
-🚨 CRITICAL: THIS IS "STAGING" NOT "REDESIGNING" 🚨
+[CORE PRINCIPLE]:
+This is PROFESSIONAL HOME STAGING - transforming empty/sparse spaces into warm, lived-in homes.
+PRESERVE the existing structure but ADD what's MISSING to make it feel complete.
 
-[PRESERVATION - 100% MANDATORY]:
-The following must remain COMPLETELY IDENTICAL to the input image:
-• All furniture (sofa, table, chair, bed, cabinet) - EXACT same item, position, color, material
-• Flooring - EXACT same (hardwood stays hardwood, tiles stay tiles, same color)
-• Walls - EXACT same paint color and texture
-• Curtains/blinds - EXACT same
-• Existing artwork/frames - EXACT same
-• Lighting fixtures - EXACT same
-• All existing decorations - EXACT same
+[MUST PRESERVE - DO NOT CHANGE]:
+• Existing furniture → Keep exact same items in same positions
+• Floor material and color → Keep exactly as-is
+• Wall color → Keep exactly as-is
+• Window structure → Keep exactly as-is
+• Existing built-in elements → Keep as-is
 
-❌ FORBIDDEN ACTIONS:
-• Changing ANY existing furniture
-• Changing floor color or material
-• Changing wall color
-• Moving anything
-• Replacing anything
-• Removing anything
+[ACTIVELY ADD - BE GENEROUS]:
+Look at what the room LACKS and ADD these elements:
 
-✅ ALLOWED ACTIONS (ADD TO EMPTY SPACES ONLY):
-• Add small plant pots to empty corners or empty table surfaces
-• Add throw pillows to sofas (if space available)
-• Add small decorative items (vase, candle, books) to empty surfaces
-• Add a small rug to completely bare floor areas
-• Add wall art to completely empty walls
+🪴 PLANTS (add multiple):
+   - Large statement plant in empty corners (monstera, fiddle leaf fig, palm)
+   - Medium plants on shelves/surfaces
+   - Small plants on tables
+
+🛋️ SOFT ELEMENTS:
+   - 3-5 throw pillows on sofas/beds in coordinating colors
+   - Cozy throw blanket draped casually
+   - Area rug under/in front of furniture
+
+🎨 WALL DECOR (fill bare walls):
+   - Large artwork or gallery arrangement
+   - Decorative mirror
+   - Floating shelves with objects
+
+💡 LIGHTING (add warmth):
+   - Floor lamp in dark corners
+   - Table lamps on side tables
+   - Warm ambient lighting
+
+📚 ACCESSORIES (layer surfaces):
+   - Stack of books
+   - Vases with fresh flowers
+   - Candles and decorative objects
+   - Trays with curated items
+   - Photo frames
+
+📺 IF SPACE LOOKS EMPTY, ADD:
+   - TV if living room lacks one
+   - Coffee table accessories
+   - Side table with lamp and decor
 
 [STYLE]: ${styleName}
-[GUIDANCE]: ${stylingPrompt}
+[SPECIFIC STAGING PLAN]: ${stylingPrompt}
 
-The output image must look like the SAME room with a few small decorative additions.
-If someone compares before/after, they should say "Oh, they added a plant and some pillows"
-NOT "They changed everything".
+[GOAL]:
+The AFTER image should look like a professionally staged home ready for a magazine photoshoot.
+It should feel WARM, COMPLETE, and LIVED-IN - not sparse or empty.
+Someone comparing before/after should think "Wow, this looks so much more inviting now!"
 
-OUTPUT: Generate the staged image.`,
+OUTPUT: Generate the professionally staged image.`,
           },
           { file_data: { mime_type: 'image/jpeg', file_uri: fileUri } },
         ],
