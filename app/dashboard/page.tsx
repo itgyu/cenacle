@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, User, ArrowRight, FolderOpen } from 'lucide-react';
+import { Search, User, ArrowRight, FolderOpen, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { getProjects, Project } from '@/lib/projects-api';
+import { getProjects, deleteProject, Project } from '@/lib/projects-api';
 import { AuthGuard } from '@/components/AuthGuard';
 import { isAuthError } from '@/lib/errors';
 
@@ -26,6 +26,11 @@ function DashboardContent() {
     totalPhotos: 0,
     totalStyled: 0,
   });
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; project: Project | null }>({
+    show: false,
+    project: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Load projects from API
   useEffect(() => {
@@ -61,6 +66,25 @@ function DashboardContent() {
 
     loadProjects();
   }, [router]);
+
+  // Handle project deletion
+  const handleDeleteProject = async () => {
+    if (!deleteConfirm.project) return;
+
+    setIsDeleting(true);
+    const result = await deleteProject(deleteConfirm.project.projectId);
+    setIsDeleting(false);
+
+    if (result.error) {
+      alert(result.error);
+      return;
+    }
+
+    // Remove from local state
+    setProjects((prev) => prev.filter((p) => p.projectId !== deleteConfirm.project?.projectId));
+    setStats((prev) => ({ ...prev, totalProjects: prev.totalProjects - 1 }));
+    setDeleteConfirm({ show: false, project: null });
+  };
 
   // Filter projects by search query
   const filteredProjects = projects.filter(
@@ -213,23 +237,35 @@ function DashboardContent() {
                         {new Date(project.createdAt).toLocaleDateString('ko-KR')}
                       </p>
                     </div>
-                    <div className="flex items-center">
-                      <div
-                        className={`w-2 h-2 rounded-full mr-2 ${
-                          project.status === 'active'
-                            ? 'bg-[#4b5840]'
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirm({ show: true, project });
+                        }}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                        title="프로젝트 삭제"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="flex items-center">
+                        <div
+                          className={`w-2 h-2 rounded-full mr-2 ${
+                            project.status === 'active'
+                              ? 'bg-[#4b5840]'
+                              : project.status === 'completed'
+                                ? 'bg-green-500'
+                                : 'bg-gray-400'
+                          }`}
+                        />
+                        <span className="text-xs text-gray-500">
+                          {project.status === 'active'
+                            ? '진행중'
                             : project.status === 'completed'
-                              ? 'bg-green-500'
-                              : 'bg-gray-400'
-                        }`}
-                      />
-                      <span className="text-xs text-gray-500">
-                        {project.status === 'active'
-                          ? '진행중'
-                          : project.status === 'completed'
-                            ? '완료'
-                            : '계획중'}
-                      </span>
+                              ? '완료'
+                              : '계획중'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -264,6 +300,61 @@ function DashboardContent() {
         >
           새 프로젝트 시작
         </motion.button>
+
+        {/* 삭제 확인 모달 */}
+        <AnimatePresence>
+          {deleteConfirm.show && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              onClick={() => !isDeleting && setDeleteConfirm({ show: false, project: null })}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl p-6 w-full max-w-[320px] shadow-xl"
+              >
+                <div className="text-center mb-4">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Trash2 size={24} className="text-red-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">프로젝트 삭제</h3>
+                  <p className="text-sm text-gray-600">
+                    <strong className="text-gray-900">{deleteConfirm.project?.projectName}</strong>
+                    <br />
+                    프로젝트를 삭제하시겠습니까?
+                    <br />
+                    <span className="text-red-500">삭제된 데이터는 복구할 수 없습니다.</span>
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setDeleteConfirm({ show: false, project: null })}
+                    disabled={isDeleting}
+                    className="flex-1 py-2.5 px-4 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleDeleteProject}
+                    disabled={isDeleting}
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+                  >
+                    {isDeleting ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      '삭제'
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

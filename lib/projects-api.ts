@@ -401,3 +401,25 @@ export async function deleteStylingPhoto(projectId: string, photoId: string) {
   logger.debug('Styling photo deleted successfully');
   return { success: true };
 }
+
+/**
+ * 프로젝트 삭제 API
+ */
+export async function deleteProject(projectId: string) {
+  logger.debug('Deleting project:', projectId);
+
+  const { data, error } = await authenticatedApiRequest<{ message: string; projectId: string }>(
+    `/projects/${projectId}`,
+    {
+      method: 'DELETE',
+    }
+  );
+
+  if (error || !data) {
+    logger.error('Delete project failed:', error);
+    return { error: getUserFriendlyMessage(error || '프로젝트 삭제에 실패했습니다.') };
+  }
+
+  logger.debug('Project deleted successfully:', projectId);
+  return { success: true, data };
+}
