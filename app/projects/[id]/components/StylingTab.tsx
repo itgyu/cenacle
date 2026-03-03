@@ -232,7 +232,11 @@ export default function StylingTab({
                   {isNewFormat && (
                     <div className="absolute bottom-2 left-2 right-2 flex gap-2">
                       <button
-                        onClick={() => setCompareView({ photoId, data: styledData })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setCompareView({ photoId, data: styledData });
+                        }}
                         className="flex-1 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-white transition-colors flex items-center justify-center gap-1 shadow-lg"
                       >
                         <Maximize2 size={14} />
@@ -241,10 +245,12 @@ export default function StylingTab({
                     </div>
                   )}
 
-                  {/* 삭제 버튼 */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <button
-                      onClick={() => {
+                  {/* 삭제 버튼 - 우측 상단에 고정, 호버시에만 표시 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (confirm('이 스타일링 이미지를 삭제하시겠습니까?')) {
                         const updatedStylingPhotos = { ...project.stylingPhotos };
                         delete updatedStylingPhotos[photoId];
 
@@ -256,12 +262,12 @@ export default function StylingTab({
 
                         // 프로젝트 상태 업데이트 (AWS API를 통해 저장됨)
                         setProject(updatedProject);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-lg"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
+                      }
+                    }}
+                    className="absolute top-2 right-10 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-lg z-10"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
               );
             })}
@@ -428,47 +434,45 @@ export default function StylingTab({
 
           <div className="space-y-3">
             {DEFAULT_SPACES.map((space) => {
-              const afterPhotoCount = project?.afterPhotos[space.id]
-                ? Object.values(project.afterPhotos[space.id]).filter(Boolean).length
+              const photoCount = project?.photos?.[space.id]
+                ? Object.values(project.photos[space.id]).filter(Boolean).length
                 : 0;
-              const hasAfterPhotos = afterPhotoCount > 0;
+              const hasPhotos = photoCount > 0;
 
               return (
                 <button
                   key={space.id}
-                  onClick={() => hasAfterPhotos && setSelectedSpace(space.id)}
+                  onClick={() => hasPhotos && setSelectedSpace(space.id)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl border transition-colors ${
-                    hasAfterPhotos
+                    hasPhotos
                       ? 'bg-white border-gray-200 hover:border-[#4b5840] hover:bg-[#f5f3ef]'
                       : 'bg-gray-50 border-gray-200 cursor-not-allowed'
                   }`}
-                  disabled={!hasAfterPhotos}
+                  disabled={!hasPhotos}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        hasAfterPhotos ? 'bg-gray-100' : 'bg-gray-200'
+                        hasPhotos ? 'bg-gray-100' : 'bg-gray-200'
                       }`}
                     >
                       <space.icon
                         size={24}
-                        className={hasAfterPhotos ? 'text-gray-600' : 'text-gray-400'}
+                        className={hasPhotos ? 'text-gray-600' : 'text-gray-400'}
                       />
                     </div>
                     <div className="text-left">
                       <h4
-                        className={`text-sm font-semibold ${hasAfterPhotos ? 'text-gray-900' : 'text-gray-400'}`}
+                        className={`text-sm font-semibold ${hasPhotos ? 'text-gray-900' : 'text-gray-400'}`}
                       >
                         {space.name}
                       </h4>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {hasAfterPhotos
-                          ? `업로드 된 시공 후 사진 ${afterPhotoCount}개`
-                          : '업로드 된 시공 후 사진이 없습니다'}
+                        {hasPhotos ? `업로드된 사진 ${photoCount}개` : '업로드된 사진이 없습니다'}
                       </p>
                     </div>
                   </div>
-                  {hasAfterPhotos && (
+                  {hasPhotos && (
                     <svg
                       className="w-5 h-5 text-gray-400"
                       fill="none"
@@ -526,8 +530,8 @@ export default function StylingTab({
           <div>
             <h4 className="font-semibold text-sm text-gray-900 mb-3">스타일링할 사진 선택</h4>
             <div className="grid grid-cols-2 gap-3">
-              {project?.afterPhotos[selectedSpace] &&
-                Object.entries(project.afterPhotos[selectedSpace])
+              {project?.photos?.[selectedSpace] &&
+                Object.entries(project.photos[selectedSpace])
                   .filter(([_, photo]) => photo)
                   .map(([shotId, photo]) => (
                     <button
@@ -541,7 +545,7 @@ export default function StylingTab({
                     >
                       <Image
                         src={photo as string}
-                        alt="시공 후 사진"
+                        alt="인테리어 사진"
                         width={200}
                         height={200}
                         className="w-full h-full object-cover"
