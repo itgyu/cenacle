@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Download, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Check, Download, ZoomIn, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import type { Project, StylingPhoto } from '../types';
 
 // 스타일링 사진이 새로운 형식인지 확인하는 헬퍼 함수
@@ -16,6 +16,7 @@ interface PhotoGalleryProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectPhoto?: (photoUrl: string, photoId: string) => void;
+  onDeletePhoto?: (photoId: string) => void;
   selectedPhoto?: string | null;
   mode?: 'view' | 'select'; // view: 보기만, select: 선택 가능
 }
@@ -25,6 +26,7 @@ export default function PhotoGallery({
   isOpen,
   onClose,
   onSelectPhoto,
+  onDeletePhoto,
   selectedPhoto,
   mode = 'view',
 }: PhotoGalleryProps) {
@@ -149,11 +151,28 @@ export default function PhotoGallery({
 
                           {/* 스타일 뱃지 */}
                           {isNewFormat && (
-                            <div className="absolute top-2 left-2">
+                            <div className="absolute top-2 left-2 z-10">
                               <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded text-xs font-medium">
                                 {styleNames[styledData.style] || styledData.style}
                               </span>
                             </div>
+                          )}
+
+                          {/* 삭제 버튼 */}
+                          {onDeletePhoto && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                if (confirm('이 사진을 삭제하시겠습니까?')) {
+                                  onDeletePhoto(photoId);
+                                }
+                              }}
+                              className="absolute top-2 right-2 z-10 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-lg transition-colors"
+                              title="삭제"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           )}
 
                           {/* 이미지 클릭 시 전체화면으로 보기 */}

@@ -6,11 +6,10 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, FolderOpen, Settings, Home, X, Trash2, Building2 } from 'lucide-react';
 import type { Project } from './types';
 import { TABS, DEFAULT_SPACES } from './constants';
-import BeforeTab from './components/BeforeTab';
-import AfterTab from './components/AfterTab';
+import PhotosTab from './components/PhotosTab';
 import StylingTab from './components/StylingTab';
 import PhotoGallery from './components/PhotoGallery';
-import { getProject, uploadPhoto } from '@/lib/projects-api';
+import { getProject, uploadPhoto, uploadStylingPhoto } from '@/lib/projects-api';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -19,7 +18,6 @@ export default function ProjectDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [showGuide, setShowGuide] = useState(false);
-  const [showAfterGuide, setShowAfterGuide] = useState(false);
   const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>({
     living: false,
     kitchen: false,
@@ -74,8 +72,7 @@ export default function ProjectDetailPage() {
         // Ensure required fields have default values
         const projectData = {
           ...result.data,
-          beforePhotos: result.data.beforePhotos || {},
-          afterPhotos: result.data.afterPhotos || {},
+          photos: result.data.photos || {},
           stylingPhotos: result.data.stylingPhotos || {},
           aiStylePhotos: result.data.aiStylePhotos || [],
           spaces: result.data.spaces || [],
@@ -105,55 +102,12 @@ export default function ProjectDetailPage() {
     }));
   };
 
-  // 시공 전 사진 업로드
-  const handleBeforePhotoUpload = async (spaceId: string, shotId: string, file: File) => {
+  // 사진 업로드
+  const handlePhotoUpload = async (spaceId: string, shotId: string, file: File) => {
     if (!project) return;
 
     try {
-      console.log('[PhotoUpload] Uploading before photo:', {
-        spaceId,
-        shotId,
-        fileName: file.name,
-        fileSize: file.size,
-      });
-
-      // Presigned URL 방식으로 S3에 직접 업로드
-      const result = await uploadPhoto(project.projectId, file, 'before', spaceId, shotId);
-
-      if (result.error) {
-        console.error('[PhotoUpload] API error:', result.error);
-        alert(`사진 업로드 실패: ${result.error}`);
-        return;
-      }
-
-      // 업로드된 S3 URL로 프로젝트 상태 업데이트
-      const updatedProject = {
-        ...project,
-        beforePhotos: {
-          ...project.beforePhotos,
-          [spaceId]: {
-            ...(project.beforePhotos[spaceId] || {}),
-            [shotId]: result.data, // S3 URL
-          },
-        },
-        updatedAt: new Date().toISOString(),
-      };
-
-      console.log('[PhotoUpload] Updated project:', updatedProject);
-      setProject(updatedProject);
-      console.log('[PhotoUpload] Photo uploaded successfully to S3:', result.data);
-    } catch (error) {
-      console.error('사진 업로드 오류:', error);
-      alert('사진 업로드 중 오류가 발생했습니다.');
-    }
-  };
-
-  // 시공 후 사진 업로드
-  const handleAfterPhotoUpload = async (spaceId: string, shotId: string, file: File) => {
-    if (!project) return;
-
-    try {
-      console.log('[PhotoUpload] Uploading after photo:', {
+      console.log('[PhotoUpload] Uploading photo:', {
         spaceId,
         shotId,
         fileName: file.name,
@@ -172,10 +126,10 @@ export default function ProjectDetailPage() {
       // 업로드된 S3 URL로 프로젝트 상태 업데이트
       const updatedProject = {
         ...project,
-        afterPhotos: {
-          ...project.afterPhotos,
+        photos: {
+          ...project.photos,
           [spaceId]: {
-            ...(project.afterPhotos[spaceId] || {}),
+            ...(project.photos?.[spaceId] || {}),
             [shotId]: result.data, // S3 URL
           },
         },
@@ -192,17 +146,17 @@ export default function ProjectDetailPage() {
   };
 
   // 사진 삭제
-  const handleDeletePhoto = (type: 'before' | 'after', spaceId: string, shotId: string) => {
+  const handleDeletePhoto = (spaceId: string, shotId: string) => {
     if (!project) return;
 
-    console.log('[PhotoDelete] Deleting photo:', { type, spaceId, shotId });
+    console.log('[PhotoDelete] Deleting photo:', { spaceId, shotId });
 
     const updatedProject = {
       ...project,
-      [type === 'before' ? 'beforePhotos' : 'afterPhotos']: {
-        ...project[type === 'before' ? 'beforePhotos' : 'afterPhotos'],
+      photos: {
+        ...project.photos,
         [spaceId]: {
-          ...(project[type === 'before' ? 'beforePhotos' : 'afterPhotos'][spaceId] || {}),
+          ...(project.photos?.[spaceId] || {}),
           [shotId]: undefined,
         },
       },
@@ -261,15 +215,32 @@ export default function ProjectDetailPage() {
       // AI가 생성한 이미지 URL 사용
       const styledImage = data.styledImage;
 
+      // S3에 스타일링 이미지 업로드 및 DynamoDB 저장
+      console.log('[AIStyling] Uploading styled image to S3...');
+      const uploadResult = await uploadStylingPhoto(
+        project.projectId,
+        selectedPhoto,
+        styledImage,
+        selectedStyle,
+        selectedSpace || 'general'
+      );
+
+      if (uploadResult.error) {
+        console.error('[AIStyling] Upload failed:', uploadResult.error);
+        // 업로드 실패해도 로컬에는 저장
+      }
+
       // 스타일링된 이미지를 프로젝트에 저장 (Before/After 정보 포함)
-      const photoId = `${selectedSpace}_${Date.now()}`;
+      const photoId = uploadResult.data?.photoId || `${selectedSpace}_${Date.now()}`;
+      const savedImageUrl = uploadResult.data?.imageUrl || styledImage;
+
       const updatedProject = {
         ...project,
         stylingPhotos: {
           ...project.stylingPhotos,
           [photoId]: {
             originalPhoto: selectedPhoto,
-            styledPhoto: styledImage,
+            styledPhoto: savedImageUrl,
             style: selectedStyle,
             createdAt: new Date().toISOString(),
           },
@@ -279,13 +250,16 @@ export default function ProjectDetailPage() {
 
       console.log('[AIStyling] Updated project:', updatedProject);
       setProject(updatedProject);
-      console.log('[AIStyling] Styling completed successfully (local state only)');
 
-      // TODO: API로 S3에 업로드하고 DynamoDB 업데이트하는 기능 추가 필요
-
-      alert(
-        'AI 스타일링이 완료되어 사진 보관함에 저장되었습니다!\n(참고: 새로고침하면 사라집니다)'
-      );
+      if (uploadResult.data?.imageUrl) {
+        console.log('[AIStyling] Styling completed and saved to S3:', uploadResult.data.imageUrl);
+        alert('AI 스타일링이 완료되어 사진 보관함에 저장되었습니다!');
+      } else {
+        console.log('[AIStyling] Styling completed (local state only - S3 upload failed)');
+        alert(
+          'AI 스타일링이 완료되었습니다!\n(참고: 서버 저장에 실패하여 새로고침하면 사라질 수 있습니다)'
+        );
+      }
 
       // 상태 초기화
       setSelectedSpace(null);
@@ -302,33 +276,20 @@ export default function ProjectDetailPage() {
   // 탭별 콘텐츠 렌더링 함수
   const renderTabContent = () => {
     switch (activeTab) {
-      case 1: // 시공 전
+      case 1: // 사진
         return (
-          <BeforeTab
+          <PhotosTab
             project={project}
             showGuide={showGuide}
             setShowGuide={setShowGuide}
             expandedSpaces={expandedSpaces}
             toggleSpace={toggleSpace}
-            handleBeforePhotoUpload={handleBeforePhotoUpload}
+            handlePhotoUpload={handlePhotoUpload}
             handleDeletePhoto={handleDeletePhoto}
             fileInputRefs={fileInputRefs}
           />
         );
-      case 2: // 시공 후
-        return (
-          <AfterTab
-            project={project}
-            showAfterGuide={showAfterGuide}
-            setShowAfterGuide={setShowAfterGuide}
-            expandedSpaces={expandedSpaces}
-            toggleSpace={toggleSpace}
-            handleAfterPhotoUpload={handleAfterPhotoUpload}
-            handleDeletePhoto={handleDeletePhoto}
-            fileInputRefs={fileInputRefs}
-          />
-        );
-      case 3: // 스타일링
+      case 2: // AI 스타일링
         return (
           <StylingTab
             project={project}
@@ -347,13 +308,13 @@ export default function ProjectDetailPage() {
         );
       default:
         return (
-          <BeforeTab
+          <PhotosTab
             project={project}
             showGuide={showGuide}
             setShowGuide={setShowGuide}
             expandedSpaces={expandedSpaces}
             toggleSpace={toggleSpace}
-            handleBeforePhotoUpload={handleBeforePhotoUpload}
+            handlePhotoUpload={handlePhotoUpload}
             handleDeletePhoto={handleDeletePhoto}
             fileInputRefs={fileInputRefs}
           />
@@ -455,6 +416,16 @@ export default function ProjectDetailPage() {
         project={project}
         isOpen={showPhotoGallery}
         onClose={() => setShowPhotoGallery(false)}
+        onDeletePhoto={(photoId) => {
+          if (!project) return;
+          const updatedStylingPhotos = { ...project.stylingPhotos };
+          delete updatedStylingPhotos[photoId];
+          setProject({
+            ...project,
+            stylingPhotos: updatedStylingPhotos,
+            updatedAt: new Date().toISOString(),
+          });
+        }}
         mode="view"
       />
 
