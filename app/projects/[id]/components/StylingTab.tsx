@@ -228,22 +228,22 @@ export default function StylingTab({
                     )}
                   </div>
 
-                  {/* Before/After 비교 버튼 (새로운 형식인 경우에만) */}
-                  {isNewFormat && (
-                    <div className="absolute bottom-2 left-2 right-2 flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
+                  {/* 크게 보기 버튼 */}
+                  <div className="absolute bottom-2 left-2 right-2 flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (isNewFormat) {
                           setCompareView({ photoId, data: styledData });
-                        }}
-                        className="flex-1 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-white transition-colors flex items-center justify-center gap-1 shadow-lg"
-                      >
-                        <Maximize2 size={14} />
-                        Before/After
-                      </button>
-                    </div>
-                  )}
+                        }
+                      }}
+                      className="flex-1 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-white transition-colors flex items-center justify-center gap-1 shadow-lg"
+                    >
+                      <Maximize2 size={14} />
+                      크게 보기
+                    </button>
+                  </div>
 
                   {/* 삭제 버튼 - 우측 상단에 고정, 호버시에만 표시 */}
                   <button
