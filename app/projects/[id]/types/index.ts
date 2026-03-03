@@ -17,8 +17,7 @@ export interface Project {
   currentStep: number;
   createdAt: string;
   updatedAt: string;
-  beforePhotos: Record<string, Record<string, string>>; // spaceId -> shotId -> base64
-  afterPhotos: Record<string, Record<string, string>>; // spaceId -> shotId -> base64
+  photos: Record<string, Record<string, string>>; // spaceId -> shotId -> URL
   stylingPhotos: Record<string, string | StylingPhoto>; // photoId -> styled base64 (legacy) or StylingPhoto object
   aiStylePhotos: any[];
   spaces: any[];

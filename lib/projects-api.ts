@@ -247,3 +247,157 @@ export async function uploadPhoto(
   logger.debug('Photo upload workflow completed:', imageUrl);
   return { data: imageUrl };
 }
+
+/**
+ * Base64 이미지를 S3에 업로드 (스타일링 결과용)
+ */
+export async function uploadBase64ToS3(presignedUrl: string, base64Data: string) {
+  logger.debug('Uploading base64 to S3...');
+
+  try {
+    // base64에서 data URL prefix 제거
+    const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, '');
+
+    // base64를 바이너리로 변환
+    const binaryString = atob(base64Content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'image/jpeg' });
+
+    const response = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: blob,
+      headers: {
+        'Content-Type': 'image/jpeg',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`S3 upload failed: ${response.status}`);
+    }
+
+    logger.debug('S3 base64 upload successful');
+    return { success: true };
+  } catch (error) {
+    logger.error('S3 base64 upload error:', error);
+    return { error: error instanceof Error ? error.message : 'S3 업로드에 실패했습니다.' };
+  }
+}
+
+/**
+ * 스타일링 이미지 업로드 (원본 + 스타일링 결과)
+ */
+export async function uploadStylingPhoto(
+  projectId: string,
+  originalPhoto: string,
+  styledPhoto: string,
+  style: string,
+  spaceId: string
+) {
+  logger.debug('Starting styling photo upload:', { projectId, style, spaceId });
+
+  const photoId = `${spaceId}_${Date.now()}`;
+
+  // 1. Presigned URL 요청 (스타일링 이미지용)
+  const urlResult = await getPresignedUrl(projectId, {
+    type: 'after',
+    spaceId: `styling_${spaceId}`,
+    shotId: photoId,
+    contentType: 'image/jpeg',
+  });
+
+  if (urlResult.error || !urlResult.data) {
+    return { error: urlResult.error };
+  }
+
+  const { uploadUrl, imageUrl } = urlResult.data;
+
+  // 2. S3에 스타일링 이미지 업로드
+  const uploadResult = await uploadBase64ToS3(uploadUrl, styledPhoto);
+  if (uploadResult.error) {
+    return { error: uploadResult.error };
+  }
+
+  // 3. DynamoDB stylingPhotos 필드에 저장 (새 API 사용)
+  const { data: saveData, error: saveError } = await authenticatedApiRequest<{
+    message: string;
+    photoId: string;
+    stylingData: {
+      originalPhoto: string;
+      styledPhoto: string;
+      style: string;
+      createdAt: string;
+    };
+  }>(`/projects/${projectId}/styling`, {
+    method: 'POST',
+    body: JSON.stringify({
+      photoId,
+      originalPhoto,
+      styledPhoto: imageUrl, // S3 URL 저장
+      style,
+    }),
+  });
+
+  if (saveError) {
+    logger.error('DynamoDB styling save failed:', saveError);
+    // S3에는 이미 업로드됨, 로컬 상태로라도 유지
+  }
+
+  logger.debug('Styling photo upload completed:', imageUrl);
+  return {
+    data: {
+      imageUrl,
+      photoId,
+      originalPhoto,
+      style,
+    },
+  };
+}
+
+/**
+ * 영역별 사진 삭제 API
+ */
+export async function deletePhoto(projectId: string, spaceId: string, shotId: string) {
+  logger.debug('Deleting photo:', { projectId, spaceId, shotId });
+
+  const { data, error } = await authenticatedApiRequest<{ message: string }>(
+    `/projects/${projectId}/photos/delete`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ spaceId, shotId }),
+    }
+  );
+
+  if (error || !data) {
+    logger.error('Delete photo failed:', error);
+    return { error: error || '사진 삭제에 실패했습니다.' };
+  }
+
+  logger.debug('Photo deleted successfully');
+  return { success: true };
+}
+
+/**
+ * 스타일링 사진 삭제 API
+ */
+export async function deleteStylingPhoto(projectId: string, photoId: string) {
+  logger.debug('Deleting styling photo:', { projectId, photoId });
+
+  const { data, error } = await authenticatedApiRequest<{ message: string }>(
+    `/projects/${projectId}/styling/delete`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ photoId }),
+    }
+  );
+
+  if (error || !data) {
+    logger.error('Delete styling photo failed:', error);
+    return { error: error || '스타일링 사진 삭제에 실패했습니다.' };
+  }
+
+  logger.debug('Styling photo deleted successfully');
+  return { success: true };
+}

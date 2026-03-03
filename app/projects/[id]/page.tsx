@@ -9,7 +9,13 @@ import { TABS, DEFAULT_SPACES } from './constants';
 import PhotosTab from './components/PhotosTab';
 import StylingTab from './components/StylingTab';
 import PhotoGallery from './components/PhotoGallery';
-import { getProject, uploadPhoto, uploadStylingPhoto } from '@/lib/projects-api';
+import {
+  getProject,
+  uploadPhoto,
+  uploadStylingPhoto,
+  deletePhoto,
+  deleteStylingPhoto,
+} from '@/lib/projects-api';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -146,11 +152,12 @@ export default function ProjectDetailPage() {
   };
 
   // 사진 삭제
-  const handleDeletePhoto = (spaceId: string, shotId: string) => {
+  const handleDeletePhoto = async (spaceId: string, shotId: string) => {
     if (!project) return;
 
     console.log('[PhotoDelete] Deleting photo:', { spaceId, shotId });
 
+    // 로컬 상태 먼저 업데이트 (빠른 UI 반응)
     const updatedProject = {
       ...project,
       photos: {
@@ -162,11 +169,16 @@ export default function ProjectDetailPage() {
       },
       updatedAt: new Date().toISOString(),
     };
-
     setProject(updatedProject);
-    console.log('[PhotoDelete] Photo deleted successfully (local state only)');
 
-    // TODO: API로 DynamoDB 업데이트하는 기능 추가 필요
+    // API로 DynamoDB에서도 삭제
+    const result = await deletePhoto(project.projectId, spaceId, shotId);
+    if (result.error) {
+      console.error('[PhotoDelete] API error:', result.error);
+      // API 실패해도 로컬에서는 이미 삭제됨 (새로고침하면 복구됨)
+    } else {
+      console.log('[PhotoDelete] Photo deleted from DynamoDB successfully');
+    }
   };
 
   // 프로젝트 삭제 기능
@@ -304,6 +316,28 @@ export default function ProjectDetailPage() {
             isStyling={isStyling}
             handleAIStyling={handleAIStyling}
             setProject={setProject}
+            onDeleteStylingPhoto={async (photoId) => {
+              if (!project) return;
+
+              // 로컬 상태 먼저 업데이트 (빠른 UI 반응)
+              const updatedStylingPhotos = { ...project.stylingPhotos };
+              delete updatedStylingPhotos[photoId];
+              setProject({
+                ...project,
+                stylingPhotos: updatedStylingPhotos,
+                updatedAt: new Date().toISOString(),
+              });
+
+              // API로 DynamoDB에서도 삭제
+              const result = await deleteStylingPhoto(project.projectId, photoId);
+              if (result.error) {
+                console.error('[StylingPhotoDelete] API error:', result.error);
+              } else {
+                console.log(
+                  '[StylingPhotoDelete] Styling photo deleted from DynamoDB successfully'
+                );
+              }
+            }}
           />
         );
       default:
@@ -416,8 +450,10 @@ export default function ProjectDetailPage() {
         project={project}
         isOpen={showPhotoGallery}
         onClose={() => setShowPhotoGallery(false)}
-        onDeletePhoto={(photoId) => {
+        onDeletePhoto={async (photoId) => {
           if (!project) return;
+
+          // 로컬 상태 먼저 업데이트 (빠른 UI 반응)
           const updatedStylingPhotos = { ...project.stylingPhotos };
           delete updatedStylingPhotos[photoId];
           setProject({
@@ -425,6 +461,14 @@ export default function ProjectDetailPage() {
             stylingPhotos: updatedStylingPhotos,
             updatedAt: new Date().toISOString(),
           });
+
+          // API로 DynamoDB에서도 삭제
+          const result = await deleteStylingPhoto(project.projectId, photoId);
+          if (result.error) {
+            console.error('[StylingPhotoDelete] API error:', result.error);
+          } else {
+            console.log('[StylingPhotoDelete] Styling photo deleted from DynamoDB successfully');
+          }
         }}
         mode="view"
       />

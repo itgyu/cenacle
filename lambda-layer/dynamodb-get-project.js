@@ -59,6 +59,7 @@ exports.handler = async (event) => {
       createdAt: result.Item.createdAt,
       updatedAt: result.Item.updatedAt,
       photos: result.Item.photos || {},
+      stylingPhotos: result.Item.stylingPhotos || {},
       styling: result.Item.styling || {},
     };
 

@@ -1,0 +1,273 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1772525160200,
+  "projectRoot": "/Users/taegyulee/Desktop/keystonepartners/cenacledesign",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": ["package.json"]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": ["tsconfig.json"]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.1.6",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.0",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.0",
+        "category": "frontend"
+      },
+      {
+        "name": "@playwright/test",
+        "version": "1.58.2",
+        "category": "testing"
+      },
+      {
+        "name": "jest",
+        "version": "30.2.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "pnpm build",
+    "testCommand": "pnpm test",
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "build": "next build",
+      "dev": "next dev",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "start": "next start",
+      "test": "jest",
+      "test:watch": "jest --watch",
+      "test:ci": "jest --ci --coverage",
+      "test:e2e": "playwright test",
+      "test:e2e:ui": "playwright test --ui",
+      "test:e2e:headed": "playwright test --headed",
+      "format": "prettier --write .",
+      "format:check": "prettier --check .",
+      "prepare": "husky"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": ["app", "components", "docs", "lib", "public"],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1772525160177,
+      "keyFiles": ["globals.css", "icon.svg", "layout.tsx", "page.tsx"]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 10,
+      "lastAccessed": 1772525160177,
+      "keyFiles": [
+        "AuthGuard.tsx",
+        "footer.tsx",
+        "header.tsx",
+        "hero-section.tsx",
+        "process-section.tsx"
+      ]
+    },
+    "contexts": {
+      "path": "contexts",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772525160178,
+      "keyFiles": ["AuthContext.tsx"]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 4,
+      "lastAccessed": 1772525160178,
+      "keyFiles": ["API.md", "ARCHITECTURE.md"]
+    },
+    "e2e": {
+      "path": "e2e",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1772525160184,
+      "keyFiles": []
+    },
+    "hooks": {
+      "path": "hooks",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1772525160184,
+      "keyFiles": ["use-mobile.ts", "use-toast.ts"]
+    },
+    "lambda-functions": {
+      "path": "lambda-functions",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1772525160185,
+      "keyFiles": []
+    },
+    "lambda-layer": {
+      "path": "lambda-layer",
+      "purpose": null,
+      "fileCount": 25,
+      "lastAccessed": 1772525160185,
+      "keyFiles": [
+        "DEPLOYMENT_GUIDE.md",
+        "DYNAMODB_SETUP_GUIDE.md",
+        "PROJECTS_LAMBDA_DEPLOYMENT.md",
+        "cenacle-layer.zip",
+        "create-project.zip"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 5,
+      "lastAccessed": 1772525160185,
+      "keyFiles": ["api-config.ts", "auth-api.ts", "errors.ts", "projects-api.ts", "utils.ts"]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 7,
+      "lastAccessed": 1772525160186,
+      "keyFiles": [
+        "favicon.ico",
+        "placeholder-logo.png",
+        "placeholder-logo.svg",
+        "placeholder-user.jpg",
+        "placeholder.jpg"
+      ]
+    },
+    "styles": {
+      "path": "styles",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772525160187,
+      "keyFiles": ["globals.css"]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 1,
+      "lastAccessed": 1772525160187,
+      "keyFiles": []
+    },
+    "e2e/fixtures": {
+      "path": "e2e/fixtures",
+      "purpose": "Test fixtures",
+      "fileCount": 2,
+      "lastAccessed": 1772525160188,
+      "keyFiles": ["README.md", "auth.fixture.ts"]
+    },
+    "e2e/pages": {
+      "path": "e2e/pages",
+      "purpose": "Page components",
+      "fileCount": 4,
+      "lastAccessed": 1772525160188,
+      "keyFiles": ["dashboard.page.ts", "login.page.ts", "project.page.ts"]
+    },
+    "e2e/tests": {
+      "path": "e2e/tests",
+      "purpose": "Test files",
+      "fileCount": 3,
+      "lastAccessed": 1772525160189,
+      "keyFiles": ["auth.spec.ts", "photo.spec.ts", "project.spec.ts"]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "app/projects/[id]/components/StylingTab.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1772533303893,
+      "type": "file"
+    },
+    {
+      "path": "app/projects/[id]/components/PhotoGallery.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1772528845726,
+      "type": "file"
+    },
+    {
+      "path": "app/projects/[id]/page.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1772533316152,
+      "type": "file"
+    },
+    {
+      "path": "app/api/style/route.ts",
+      "accessCount": 8,
+      "lastAccessed": 1772532483160,
+      "type": "file"
+    },
+    {
+      "path": "app/projects/[id]/components/PhotosTab.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1772532893397,
+      "type": "file"
+    },
+    {
+      "path": "lib/projects-api.ts",
+      "accessCount": 2,
+      "lastAccessed": 1772533247136,
+      "type": "file"
+    },
+    {
+      "path": "lambda-layer/dynamodb-save-photo.js",
+      "accessCount": 1,
+      "lastAccessed": 1772533208267,
+      "type": "file"
+    },
+    {
+      "path": "lib/api-config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1772533208984,
+      "type": "file"
+    },
+    {
+      "path": "lambda-layer/dynamodb-delete-photo.js",
+      "accessCount": 1,
+      "lastAccessed": 1772533224555,
+      "type": "file"
+    },
+    {
+      "path": "lambda-layer/dynamodb-delete-styling.js",
+      "accessCount": 1,
+      "lastAccessed": 1772533233959,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

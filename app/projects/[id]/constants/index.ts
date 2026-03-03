@@ -2,9 +2,8 @@ import { Sofa, ChefHat, Bed, Bath } from 'lucide-react';
 import type { Space, Tab } from '../types';
 
 export const TABS: Tab[] = [
-  { id: 1, name: '시공 전' },
-  { id: 2, name: '시공 후' },
-  { id: 3, name: '스타일링' },
+  { id: 1, name: '사진' },
+  { id: 2, name: 'AI 스타일링' },
 ];
 
 export const DEFAULT_SPACES: Space[] = [

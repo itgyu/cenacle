@@ -25,6 +25,7 @@ interface StylingTabProps {
   isStyling: boolean;
   handleAIStyling: () => void;
   setProject: (project: Project) => void;
+  onDeleteStylingPhoto?: (photoId: string) => void;
 }
 
 export default function StylingTab({
@@ -40,6 +41,7 @@ export default function StylingTab({
   isStyling,
   handleAIStyling,
   setProject,
+  onDeleteStylingPhoto,
 }: StylingTabProps) {
   const [compareView, setCompareView] = useState<{ photoId: string; data: StylingPhoto } | null>(
     null
@@ -251,17 +253,19 @@ export default function StylingTab({
                       e.stopPropagation();
                       e.preventDefault();
                       if (confirm('이 스타일링 이미지를 삭제하시겠습니까?')) {
-                        const updatedStylingPhotos = { ...project.stylingPhotos };
-                        delete updatedStylingPhotos[photoId];
-
-                        const updatedProject = {
-                          ...project,
-                          stylingPhotos: updatedStylingPhotos,
-                          updatedAt: new Date().toISOString(),
-                        };
-
-                        // 프로젝트 상태 업데이트 (AWS API를 통해 저장됨)
-                        setProject(updatedProject);
+                        // API를 통해 삭제 (onDeleteStylingPhoto가 있으면 사용)
+                        if (onDeleteStylingPhoto) {
+                          onDeleteStylingPhoto(photoId);
+                        } else {
+                          // fallback: 로컬 상태만 업데이트
+                          const updatedStylingPhotos = { ...project.stylingPhotos };
+                          delete updatedStylingPhotos[photoId];
+                          setProject({
+                            ...project,
+                            stylingPhotos: updatedStylingPhotos,
+                            updatedAt: new Date().toISOString(),
+                          });
+                        }
                       }
                     }}
                     className="absolute top-2 right-10 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-lg z-10"
