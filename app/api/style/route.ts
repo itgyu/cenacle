@@ -265,35 +265,43 @@ async function generateStylingPrompt(
       {
         parts: [
           {
-            text: `ROLE: Interior Design Prompt Engineer for SURFACE-ONLY styling.
+            text: `ROLE: Interior Decorator (ADD-ONLY styling).
 
-[INPUT ANALYSIS]:
+[CURRENT ROOM ANALYSIS]:
 ${analysisText}
 
 [TARGET STYLE]:
 ${styleName} (${stylePrompt})
 
-[ABSOLUTE RULES - MUST FOLLOW]:
-🚫 DO NOT add, remove, move, or replace ANY furniture
-🚫 DO NOT change furniture shapes, sizes, or positions
-🚫 DO NOT add new objects (plants, lamps, decorations)
-🚫 DO NOT remove existing objects
-✅ ONLY change: wall colors, floor materials, fabric textures, surface finishes
-✅ ONLY change: existing furniture's material/color/texture (same shape)
-✅ ONLY change: lighting warmth/color temperature
+[CRITICAL CONCEPT - UNDERSTAND THIS]:
+This is "STAGING" or "DECORATING" - NOT "REDESIGNING".
+The original room must remain 100% IDENTICAL.
+We are ONLY ADDING decorative items to EMPTY SPACES.
 
-[TASK]:
-Write a prompt that ONLY changes surface materials, colors, and textures.
-The furniture and objects must remain EXACTLY as they are - same items, same positions.
-Think of it as "re-skinning" the room, not "redesigning" it.
+[ABSOLUTE PRESERVATION RULES]:
+🚫 NEVER change, move, replace, or alter ANY existing item:
+   - Existing furniture (sofas, tables, chairs, beds) → KEEP AS-IS
+   - Existing flooring (hardwood, tiles, carpet) → KEEP AS-IS
+   - Existing walls and paint colors → KEEP AS-IS
+   - Existing curtains, blinds → KEEP AS-IS
+   - Existing lighting fixtures → KEEP AS-IS
+   - Existing artwork, frames → KEEP AS-IS
+
+[WHAT YOU CAN ADD - IN EMPTY SPACES ONLY]:
+✅ Small decorative plants (on empty table corners, empty floor corners)
+✅ Throw pillows (on sofas that have empty space)
+✅ Small decorative objects (vases, candles, books - on empty surfaces)
+✅ A small rug (only if floor is completely bare)
+✅ Wall art (only on completely empty walls)
 
 [OUTPUT]:
-Raw prompt text only.`,
+Write a prompt describing ONLY what small decorative items to ADD to empty spaces.
+Do NOT describe any changes to existing items.`,
           },
         ],
       },
     ],
-    generationConfig: { temperature: 0.5 },
+    generationConfig: { temperature: 0.3 },
   };
 
   const response = await callGemini(
@@ -308,7 +316,7 @@ Raw prompt text only.`,
 
   if (!promptText) {
     // 기본 프롬프트 반환
-    return `Transform this interior to ${styleName} style. ${stylePrompt}. Maintain exact room layout and furniture positions.`;
+    return `Add small ${styleName} style decorative items (plants, pillows, small decor) to empty spaces only. Keep ALL existing furniture, flooring, walls, and items exactly the same.`;
   }
 
   console.log('Prompt generated:', promptText.substring(0, 100) + '...');
@@ -331,31 +339,43 @@ async function generateStyledImage(
       {
         parts: [
           {
-            text: `TASK: Surface-Only Interior Restyling (NO furniture changes)
+            text: `TASK: Interior Staging - ADD decorative items ONLY (DO NOT CHANGE ANYTHING)
 
-🚨 ABSOLUTE RESTRICTIONS - VIOLATION = FAILURE:
-❌ DO NOT add ANY new furniture or objects
-❌ DO NOT remove ANY existing furniture or objects
-❌ DO NOT move ANY furniture positions
-❌ DO NOT replace furniture with different furniture
-❌ DO NOT change furniture shapes or sizes
-❌ DO NOT add plants, lamps, art, or decorations that don't exist
+🚨 CRITICAL: THIS IS "STAGING" NOT "REDESIGNING" 🚨
 
-✅ ONLY ALLOWED CHANGES:
-- Wall paint color/texture
-- Floor material appearance (wood tone, tile color)
-- Fabric colors/patterns on EXISTING furniture (same furniture, different fabric)
-- Existing furniture surface finish (matte→glossy, wood tone change)
-- Lighting color temperature (warm/cool)
-- Curtain/blind colors on EXISTING windows
+[PRESERVATION - 100% MANDATORY]:
+The following must remain COMPLETELY IDENTICAL to the input image:
+• All furniture (sofa, table, chair, bed, cabinet) - EXACT same item, position, color, material
+• Flooring - EXACT same (hardwood stays hardwood, tiles stay tiles, same color)
+• Walls - EXACT same paint color and texture
+• Curtains/blinds - EXACT same
+• Existing artwork/frames - EXACT same
+• Lighting fixtures - EXACT same
+• All existing decorations - EXACT same
 
-[STYLE TO APPLY]: ${styleName}
-[STYLING GUIDANCE]: ${stylingPrompt}
+❌ FORBIDDEN ACTIONS:
+• Changing ANY existing furniture
+• Changing floor color or material
+• Changing wall color
+• Moving anything
+• Replacing anything
+• Removing anything
 
-Think of this as REPAINTING and REUPHOLSTERING only.
-The room must have the EXACT SAME furniture items in the EXACT SAME positions.
+✅ ALLOWED ACTIONS (ADD TO EMPTY SPACES ONLY):
+• Add small plant pots to empty corners or empty table surfaces
+• Add throw pillows to sofas (if space available)
+• Add small decorative items (vase, candle, books) to empty surfaces
+• Add a small rug to completely bare floor areas
+• Add wall art to completely empty walls
 
-OUTPUT: Generate the restyled image only.`,
+[STYLE]: ${styleName}
+[GUIDANCE]: ${stylingPrompt}
+
+The output image must look like the SAME room with a few small decorative additions.
+If someone compares before/after, they should say "Oh, they added a plant and some pillows"
+NOT "They changed everything".
+
+OUTPUT: Generate the staged image.`,
           },
           { file_data: { mime_type: 'image/jpeg', file_uri: fileUri } },
         ],
